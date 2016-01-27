@@ -5,13 +5,6 @@ using System.IO;
 using System.Text;
 using SimpleJSON;
 
-//public class MyUser
-//{
-//	public int level;
-//	public float timeElapsed;
-//	public string playerName;
-//}
-
 public class NetworkRESTScript : MonoBehaviour {
 
 	public string baseURL = "0.0.0.0:3000"; 
@@ -27,11 +20,6 @@ public class NetworkRESTScript : MonoBehaviour {
 		yield return userData;
 		string userDataString = userData.text;
 		var jsonrepOfPatient = JSON.Parse(userData.text);
-		// just testing what happens in JSON usage
-//		print ("The packet is composed of " + jsonrepOfPatient.list.Count);
-//		var j = (JSONObject)jsonrepOfPatient.list [0];
-//		print ("The subpacket is composed of " + j.list.Count);
-//		var obj = j["name"];
 		print ("The subpacket name is " + jsonrepOfPatient["user"]["name"].Value);
 		print (userDataString);
 	}
@@ -49,7 +37,6 @@ public class NetworkRESTScript : MonoBehaviour {
 		WWW patientData = new WWW (baseURL + "/api/v1/patients/" + patientID.ToString());
 		yield return patientData;
 		string patientDataString = patientData.text;
-//		JSONObject jsonrepOfPatient = new JSONObject (patientData.text);
 		print (patientDataString);
 	}
 
@@ -66,32 +53,25 @@ public class NetworkRESTScript : MonoBehaviour {
 		// first thing for a POST is to do a form
 		WWWForm form = new WWWForm();
 
-//		Hashtable headers = form.headers; 
-		form.headers["Content-Type"] = "application/json"; 
+		form.headers["Content-Type"] = "application/json; ";
+		form.headers["Accept"] = "application/json"; 
 
-//		MyUser myObject = new MyUser();
-//		myObject.level = 1;
-//		myObject.timeElapsed = 47.5f;
-//		myObject.playerName = "Dr Charles Francis";
 
-//		if(kii_access_token != null) 
-//			headers["Authorization"] = "Bearer " + kii_access_token; 
+		JSONNode N = new JSONClass(); // Start with JSONArray or JSONClass
 
-		string json = "test";
-//		string json = JsonUtility.ToJson(myObject);
+		N["user"]["name"] = "Another";
+		N["user"]["surname"] = "Test";
+		N["user"]["email"] = "mc@test.test";
+		N["user"]["password"] = "Sementera";
+		N["user"]["role"] = "Admin";
+
+		string json = N.ToString();
 
 		Debug.Log("Formatted JSON = " + json);
 
-//		form.AddField( "user", json.ToString());
+		string JsonArraystring = "{\"user\": [{\"Id\":\"101\",\"Name\":\"Unity4.6\"},{\"Id\":\"102\",\"Name\":\"Unity5\"}]}";
 
-//		Hashtable data = new Hashtable(); 
-//		data["message"] = "Just doing a test"; 
-//		string json = JSON.JsonEncode(data); 
-//
-//		Debug.Log("Sending: " + json); 
-//
-		byte[] bytes = Encoding.UTF8.GetBytes(json); 
-//		WWW userListData = new WWW (baseURL + "/api/v1/users", form);
+		byte[] bytes = Encoding.UTF8.GetBytes(JsonArraystring); 
 
 		WWW userListData = new WWW (baseURL + "/api/v1/users", bytes, form.headers);
 		yield return userListData;
