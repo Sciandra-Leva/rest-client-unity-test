@@ -20,4 +20,20 @@ public class NetworkRESTScript : MonoBehaviour {
 		string userListDataString = userListData.text;
 		print (userListDataString);
 	}
+
+	// Use this to GET single user data
+	IEnumerator GETPatient () {
+		WWW patientData = new WWW (baseURL + "/api/v1/patients/3");
+		yield return patientData;
+		string patientDataString = patientData.text;
+		print (patientDataString);
+	}
+
+	// Use this to GET the users list
+	IEnumerator GETPatientsList () {
+		WWW patientListData = new WWW (baseURL + "/api/v1/patients");
+		yield return patientListData;
+		string patientListDataString = patientListData.text;
+		print (patientListDataString);
+	}
 }
