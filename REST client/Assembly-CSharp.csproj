@@ -45,11 +45,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\JSON\JSONObject.cs" />
-     <Compile Include="Assets\JSON\JSONTemplates.cs" />
-     <Compile Include="Assets\JSON\VectorTemplates.cs" />
      <Compile Include="Assets\NetworkRESTScript.cs" />
-     <None Include="Assets\JSON\readme.txt" />
+     <Compile Include="Assets\SimpleJSON.cs" />
  <Reference Include="UnityEngine.Networking">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
