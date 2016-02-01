@@ -8,7 +8,7 @@ using HttpUtils;
 
 public class NetworkRESTScript : MonoBehaviour {
 
-	public string baseURL = "0.0.0.0:3000"; 
+	public string baseURL = "http://localhost:3000"; 
 
 	void Start() {
 		StartCoroutine(GETUser(2));
@@ -51,13 +51,7 @@ public class NetworkRESTScript : MonoBehaviour {
 
 	// Use this to POST a new user
 	void POSTUser () {
-		// first thing for a POST is to do a form
-//		WWWForm form = new WWWForm();
-//
-//		form.headers["Content-Type"] = "application/json";
-//		form.headers["Accept"] = "application/json"; 
-//
-//
+
 		JSONNode N = new JSONClass(); // Start with JSONArray or JSONClass
 
 		N["user"]["name"] = "Another";
@@ -66,45 +60,28 @@ public class NetworkRESTScript : MonoBehaviour {
 		N["user"]["password"] = "Sementera";
 		N["user"]["role"] = "Admin";
 
-//		N["name"] = "Another";
-//		N["surname"] = "Test";
-//		N["email"] = "mc@test.test";
-//		N["password"] = "Sementera";
-//		N["role"] = "Admin";
-//
 		string json_test = N.ToString();
 
 		Debug.Log("Formatted JSON = " + json_test);
 
-		var client = new HttpUtils.RestClient();
-		client.EndPoint = @"0.0.0.0:3000/api/v1/users/";
-		client.Method = HttpVerb.POST;
-		client.ContentType = "application/json";
-		client.PostData = json_test;
-		var json = client.MakeRequest();
+		string result = "";
+		using (var client = new WebClient())
+		{
+			client.Headers[HttpRequestHeader.ContentType] = "application/json";
+			string post_url = "http://localhost:3000/api/v1/users";
+			try{
+				result = client.UploadString(post_url, "POST", json_test);
+			}
+			catch (WebException x)
+			{
+				// we can end here, to say, when the user is already registered or some shit
+				// btw it can't happen in our REST server
+				Debug.Log ("Error: " + x.Message);
+			}
+		}
+		Debug.Log(result);
 
 		return;
-//		// string JsonArraystring = "{\"user\": [{\"Id\":\"101\",\"Name\":\"Unity4.6\"},{\"Id\":\"102\",\"Name\":\"Unity5\"}]}";
-//
-//		byte[] bytes = Encoding.Default.GetBytes(json);
-//
-//		string result = System.Text.Encoding.UTF8.GetString(bytes);
-//
-//		Debug.Log("The byte array is = " + result);
-//
-//		form.AddField("user", json);
-//
-//		WWW userListData = new WWW (baseURL + "/api/v1/users", form);
-//
-////		WWW userListData = new WWW (baseURL + "/api/v1/users", bytes, form.headers);
-//		yield return userListData;
-//
-//		if(!string.IsNullOrEmpty(userListData.error)) {
-//			print( "Error downloading: " + userListData.error );
-//		} else {
-//			// show the highscores
-//			Debug.Log(userListData.text);
-//			string userListDataString = userListData.text;
-//		}
 	}
 }
+

@@ -58,7 +58,7 @@ namespace HttpUtils
 
 		public string MakeRequest(string parameters)
 		{
-			var request = (HttpWebRequest)WebRequest.Create(EndPoint + parameters);
+			var request = (HttpWebRequest)WebRequest.Create(EndPoint);
 
 			request.Method = Method.ToString();
 			request.ContentLength = 0;
@@ -66,7 +66,7 @@ namespace HttpUtils
 
 			if (!string.IsNullOrEmpty(PostData) && Method == HttpVerb.POST)
 			{
-				var encoding = new UTF8Encoding();
+//				var encoding = new UTF8Encoding();
 				var bytes = Encoding.GetEncoding("iso-8859-1").GetBytes(PostData);
 				request.ContentLength = bytes.Length;
 
