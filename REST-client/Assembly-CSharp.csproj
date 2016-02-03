@@ -48,9 +48,6 @@
      <Compile Include="Assets\$XMLParser\XMLNode.cs" />
      <Compile Include="Assets\$XMLParser\XMLNodeList.cs" />
      <Compile Include="Assets\$XMLParser\XMLParser.cs" />
-     <Compile Include="Assets\Mono.Xml\MiniParser.cs" />
-     <Compile Include="Assets\Mono.Xml\SecurityParser.cs" />
-     <Compile Include="Assets\Mono.Xml\SmallXmlParser.cs" />
      <Compile Include="Assets\NetworkRESTScript.cs" />
      <Compile Include="Assets\SimpleJSON.cs" />
      <None Include="Assets\Sessions\20160203\AldoBo\TRAILS_1138\main.xml" />

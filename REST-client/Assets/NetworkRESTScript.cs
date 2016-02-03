@@ -15,9 +15,11 @@ public class NetworkRESTScript : MonoBehaviour {
 	public string login_password = "Sementera";
 
 	void Start() {
+		
 		readFromXML ();
 		StartCoroutine(GETUser(2));
 		StartCoroutine(POSTUser());
+
 	}
 
 	void readFromXML ()
