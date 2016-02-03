@@ -45,9 +45,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Mono.Xml\MiniParser.cs" />
+     <Compile Include="Assets\Mono.Xml\SecurityParser.cs" />
+     <Compile Include="Assets\Mono.Xml\SmallXmlParser.cs" />
      <Compile Include="Assets\NetworkRESTScript.cs" />
-     <Compile Include="Assets\RestClient.cs" />
      <Compile Include="Assets\SimpleJSON.cs" />
+     <None Include="Assets\Sessions\20160202\AldoBo\PAINT_1810\main.xml" />
  <Reference Include="UnityEngine.Networking">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>

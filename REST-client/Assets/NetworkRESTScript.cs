@@ -4,15 +4,22 @@ using System.Net;
 using System.IO;
 using System.Text;
 using SimpleJSON;
-using HttpUtils;
 
 public class NetworkRESTScript : MonoBehaviour {
 
 	public string baseURL = "http://localhost:3000"; 
+	public string post_url = "http://localhost:3000/api/v1/users";
+	public string sessions_root = "/Users/lorenzosciandra/Documents/workspace-testing-lorenzo/unity-projects/rest-client-testing/REST-client/Assets";
 
 	void Start() {
+		readFromXML ();
 		StartCoroutine(GETUser(2));
 		POSTUser();
+	}
+
+	void readFromXML ()
+	{
+		
 	}
 
 	// Use this to GET single user data
@@ -68,7 +75,6 @@ public class NetworkRESTScript : MonoBehaviour {
 		using (var client = new WebClient())
 		{
 			client.Headers[HttpRequestHeader.ContentType] = "application/json";
-			string post_url = "http://localhost:3000/api/v1/users";
 			try{
 				result = client.UploadString(post_url, "POST", json_test);
 			}
