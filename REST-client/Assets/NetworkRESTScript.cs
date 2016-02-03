@@ -11,10 +11,13 @@ public class NetworkRESTScript : MonoBehaviour {
 	public string post_url = "http://localhost:3000/api/v1/users";
 	public string sessions_root = "/Users/lorenzosciandra/Documents/workspace-testing-lorenzo/unity-projects/rest-client-testing/REST-client/Assets";
 
+	public string login_email = "sciandra@leva.io";
+	public string login_password = "Sementera";
+
 	void Start() {
 		readFromXML ();
 		StartCoroutine(GETUser(2));
-		POSTUser();
+		StartCoroutine(POSTUser());
 	}
 
 	void readFromXML ()
@@ -57,7 +60,7 @@ public class NetworkRESTScript : MonoBehaviour {
 	}
 
 	// Use this to POST a new user
-	void POSTUser () {
+	IEnumerator POSTUser () {
 
 		JSONNode N = new JSONClass(); // Start with JSONArray or JSONClass
 
@@ -75,19 +78,18 @@ public class NetworkRESTScript : MonoBehaviour {
 		using (var client = new WebClient())
 		{
 			client.Headers[HttpRequestHeader.ContentType] = "application/json";
-			try{
-				result = client.UploadString(post_url, "POST", json_test);
-			}
-			catch (WebException x)
-			{
-				// we can end here, to say, when the user is already registered or some shit
-				// btw it can't happen in our REST server
-				Debug.Log ("Error: " + x.Message);
-			}
+//			try{
+//				yield return result = client.UploadString(post_url, "POST", json_test);
+//			}
+//			catch (WebException x)
+//			{
+//				// we can end here, to say, when the user is already registered or some shit
+//				// btw it can't happen in our REST server
+//				Debug.Log ("Error: " + x.Message);
+//			}
+			yield return result = client.UploadString(post_url, "POST", json_test);
 		}
 		Debug.Log(result);
-
-		return;
 	}
 }
 

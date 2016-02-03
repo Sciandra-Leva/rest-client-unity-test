@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+  <Session>
+    <InitTime>2/3/2016 11:38:31 AM</InitTime>
+    <EndTime>2/3/2016 11:39:46 AM</EndTime>
+    <PatientID>P0256</PatientID>
+    <PatientName>AldoBo</PatientName>
+    <DoctorsIDs>
+      <DocID>ewrtrew</DocID>
+      <DocID>D03</DocID>
+      <DocID>reter</DocID>
+      <DocID>D05</DocID>
+      <DocID>trytryrt</DocID>
+      <DocID>D03</DocID>
+      <DocID>iojpokpokp</DocID>
+      <DocID>D03</DocID>
+      <DocID>5651651</DocID>
+      <DocID>D03</DocID>
+      <DocID>516561</DocID>
+      <DocID>D05</DocID>
+      <DocID>rewt</DocID>
+      <DocID>D05</DocID>
+      <DocID>trewty</DocID>
+      <DocID>D03</DocID>
+      <DocID>1</DocID>
+      <DocID>D05</DocID>
+      <DocID>n</DocID>
+      <DocID>D05</DocID>
+      <DocID>v</DocID>
+      <DocID>D05</DocID>
+      <DocID>D01</DocID>
+      <DocID>D02</DocID>
+    </DoctorsIDs>
+  </Session>
+  <background>
+    <bgLayer>
+      <image>northern-lights-christmas-background-1366-768-618491.jpeg</image>
+      <!-- string: file path + name -->
+      <color>#000D0D</color>
+      <!-- #ffffff or #fff or ffffff or fff -->
+    </bgLayer>
+    <rgbaLayer>
+      <enabled>true</enabled>
+      <!-- bool -->
+      <alpha>0.5473684</alpha>
+      <!-- float -->
+    </rgbaLayer>
+    <filterLayer>
+      <color>#FF79EC</color>
+      <!-- #ffffff or #fff or ffffff or fff -->
+      <alpha>0</alpha>
+      <!-- float -->
+    </filterLayer>
+  </background>
+  <trails>
+    <enabled>
+      <patientDX>true</patientDX>
+      <patientSX>true</patientSX>
+      <othersDX>true</othersDX>
+      <othersSX>true</othersSX>
+    </enabled>
+    <dimension>20.58</dimension>
+    <!-- float -->
+    <type>FashionTrails</type>
+    <!-- Billboards or Particles or Trails or FashionTrails-->
+    <color>
+      <patientDX>#37FF18</patientDX>
+      <patientSX>#EE00EF</patientSX>
+      <othersDX>#FF0000</othersDX>
+      <othersSX>#0800D6</othersSX>
+    </color>
+    <!-- #ffffff or #fff or ffffff or fff -->
+    <timeToLive>4.73</timeToLive>
+    <!-- float -->
+    <specialFx>false</specialFx>
+    <!-- bool -->
+  </trails>
+</xml>
