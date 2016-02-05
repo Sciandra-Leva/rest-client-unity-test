@@ -9,7 +9,9 @@ public class NetworkRESTScript : MonoBehaviour {
 
 	public string baseURL = "http://localhost:3000"; 
 	public string post_url = "http://localhost:3000/api/v1/users";
-	public string sessions_root = "/Users/lorenzosciandra/Documents/workspace-testing-lorenzo/unity-projects/rest-client-testing/REST-client/Assets";
+	public string login_url = "http://localhost:3000/api/v1/sessions";
+	public string sessions_root = "";
+	public string token = "";
 
 	public string login_email = "sciandra@leva.io";
 	public string login_password = "Sementera";
@@ -17,7 +19,9 @@ public class NetworkRESTScript : MonoBehaviour {
 	void Start() {
 		readFromXML ();
 		StartCoroutine(GETUser(2));
-		StartCoroutine(POSTUser());
+		//StartCoroutine(POSTUser());
+		StartCoroutine(LOGINUser());
+
 	}
 
 	void readFromXML ()
@@ -90,6 +94,39 @@ public class NetworkRESTScript : MonoBehaviour {
 			yield return result = client.UploadString(post_url, "POST", json_test);
 		}
 		Debug.Log(result);
+	}
+
+	// Use this to POST and get a login
+	IEnumerator LOGINUser () {
+
+		JSONNode N = new JSONClass(); // Start with JSONArray or JSONClass
+
+		N["user"]["email"] = login_email;
+		N["user"]["password"] = login_password;
+
+		string json_test = N.ToString();
+
+		Debug.Log("Formatted JSON = " + json_test);
+
+		string result = "";
+		using (var client = new WebClient())
+		{
+			client.Headers[HttpRequestHeader.ContentType] = "application/json";
+			//			try{
+			//				yield return result = client.UploadString(post_url, "POST", json_test);
+			//			}
+			//			catch (WebException x)
+			//			{
+			//				// we can end here, to say, when the user is already registered or some shit
+			//				// btw it can't happen in our REST server
+			//				Debug.Log ("Error: " + x.Message);
+			//			}
+			yield return result = client.UploadString(login_url, "POST", json_test);
+		}
+		Debug.Log(result);
+		JSONNode R = new JSONClass(); // Start with JSONArray or JSONClass
+		R = JSONNode.Parse(result);
+		Debug.Log("The token is " + R["token"]);
 	}
 }
 
