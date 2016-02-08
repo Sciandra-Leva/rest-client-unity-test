@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.IO;
 using System.Text;
@@ -18,10 +19,8 @@ public class NetworkRESTScript : MonoBehaviour {
 
 	void Start() {
 		readFromXML ();
-		StartCoroutine(GETUser(2));
 		//StartCoroutine(POSTUser());
 		StartCoroutine(LOGINUser());
-
 	}
 
 	void readFromXML ()
@@ -31,12 +30,24 @@ public class NetworkRESTScript : MonoBehaviour {
 
 	// Use this to GET single user data
 	IEnumerator GETUser (int userID) {
-		WWW userData = new WWW (baseURL + "/api/v1/users/" + userID.ToString());
+//		Hashtable headers = form.headers;
+		Dictionary<string, string> headers = new Dictionary<string, string>();
+		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+		Debug.Log("The header text is " + token_string);;
+		headers.Add( "Authorization",  token_string);
+		// Add a custom header to the request.
+		// Token token="kKd_qmxUtKwKowsrrEvBxVO8jyh0-sHdikRx1WUtkxxBsMvtpJy5xE0K3mOX3FqazJMoI_ninoSz2L5LbkCnXA", email="sciandra@leva.io"
+//		headers ["Authorization"] = "Token token= " +
+//									token +
+//									", email=" +
+//									login_email;
+
+		WWW userData = new WWW (baseURL + "/api/v1/users/" + userID.ToString(), null, headers);
 		yield return userData;
-		string userDataString = userData.text;
-		var jsonrepOfPatient = JSON.Parse(userData.text);
-		print ("The subpacket name is " + jsonrepOfPatient["user"]["name"].Value);
-		print (userDataString);
+		Debug.Log("The returned text is " + userData.text);;
+//		JSONNode R = new JSONClass(); // Start with JSONArray or JSONClass
+//		R = JSONNode.Parse(userData.text);
+//		Debug.Log("The name of the retrived user is " + R["name"]);;
 	}
 
 	// Use this to GET the users list
@@ -127,6 +138,8 @@ public class NetworkRESTScript : MonoBehaviour {
 		JSONNode R = new JSONClass(); // Start with JSONArray or JSONClass
 		R = JSONNode.Parse(result);
 		Debug.Log("The token is " + R["token"]);
+		token = R ["token"];
+		StartCoroutine(GETUser(2));
 	}
 }
 
