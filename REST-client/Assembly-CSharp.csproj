@@ -45,9 +45,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\NetworkRESTScript.cs" />
+     <Compile Include="Assets\NetworkREST.cs" />
      <Compile Include="Assets\Person.cs" />
      <Compile Include="Assets\SimpleJSON.cs" />
+     <Compile Include="Assets\TestNetworkScript.cs" />
      <None Include="Assets\Sessions\20160203\AldoBo\TRAILS_1138\main.xml" />
      <None Include="Assets\Sessions\20160203\AldoBo\PHYSICS_1144\main.xml" />
      <None Include="Assets\Sessions\20160203\AldoBo\PAINT_1140\main.xml" />

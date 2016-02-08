@@ -6,41 +6,56 @@ using System.IO;
 using System.Text;
 using SimpleJSON;
 
-public class NetworkRESTScript : MonoBehaviour {
+public class NetworkREST  : MonoBehaviour {
 
 	public string baseURL = "http://localhost:3000"; 
 	public string post_url = "http://localhost:3000/api/v1/users";
 	public string login_url = "http://localhost:3000/api/v1/sessions";
-	public string sessions_root = "";
+	public string exercise_root = "";
 	public string token = "";
 
 	public string login_email = "sciandra@leva.io";
 	public string login_password = "Sementera";
 
-	void Start() {
-		readFromXML ();
-		//StartCoroutine(POSTUser());
-		StartCoroutine(LOGINUser());
+	// Use this to POST and get a login
+	public IEnumerator LOGINUser () {
+
+		JSONNode N = new JSONClass(); // Start with JSONArray or JSONClass
+
+		N["user"]["email"] = login_email;
+		N["user"]["password"] = login_password;
+
+		string json_test = N.ToString();
+
+		Debug.Log("Formatted JSON = " + json_test);
+
+		string result = "";
+		using (var client = new WebClient())
+		{
+			client.Headers[HttpRequestHeader.ContentType] = "application/json";
+			yield return result = client.UploadString(login_url, "POST", json_test);
+		}
+		Debug.Log(result);
+		JSONNode R = new JSONClass(); // Start with JSONArray or JSONClass
+		R = JSONNode.Parse(result);
+		Debug.Log("The token is " + R["token"]);
+		token = R ["token"];
+		StartCoroutine(GETUser(2));
 	}
 
-	void readFromXML ()
-	{
-		
-	}
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+
 
 	// Use this to GET single user data
-	IEnumerator GETUser (int userID) {
-//		Hashtable headers = form.headers;
+	public IEnumerator GETUser (int userID) {
 		Dictionary<string, string> headers = new Dictionary<string, string>();
 		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 		Debug.Log("The header text is " + token_string);;
 		headers.Add( "Authorization",  token_string);
-		// Add a custom header to the request.
-		// Token token="kKd_qmxUtKwKowsrrEvBxVO8jyh0-sHdikRx1WUtkxxBsMvtpJy5xE0K3mOX3FqazJMoI_ninoSz2L5LbkCnXA", email="sciandra@leva.io"
-//		headers ["Authorization"] = "Token token= " +
-//									token +
-//									", email=" +
-//									login_email;
 
 		WWW userData = new WWW (baseURL + "/api/v1/users/" + userID.ToString(), null, headers);
 		yield return userData;
@@ -106,40 +121,6 @@ public class NetworkRESTScript : MonoBehaviour {
 		}
 		Debug.Log(result);
 	}
-
-	// Use this to POST and get a login
-	IEnumerator LOGINUser () {
-
-		JSONNode N = new JSONClass(); // Start with JSONArray or JSONClass
-
-		N["user"]["email"] = login_email;
-		N["user"]["password"] = login_password;
-
-		string json_test = N.ToString();
-
-		Debug.Log("Formatted JSON = " + json_test);
-
-		string result = "";
-		using (var client = new WebClient())
-		{
-			client.Headers[HttpRequestHeader.ContentType] = "application/json";
-			//			try{
-			//				yield return result = client.UploadString(post_url, "POST", json_test);
-			//			}
-			//			catch (WebException x)
-			//			{
-			//				// we can end here, to say, when the user is already registered or some shit
-			//				// btw it can't happen in our REST server
-			//				Debug.Log ("Error: " + x.Message);
-			//			}
-			yield return result = client.UploadString(login_url, "POST", json_test);
-		}
-		Debug.Log(result);
-		JSONNode R = new JSONClass(); // Start with JSONArray or JSONClass
-		R = JSONNode.Parse(result);
-		Debug.Log("The token is " + R["token"]);
-		token = R ["token"];
-		StartCoroutine(GETUser(2));
-	}
+		
 }
 
