@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -16,6 +18,9 @@ public class NetworkREST  : MonoBehaviour {
 
 	public string login_email = "sciandra@leva.io";
 	public string login_password = "Sementera";
+
+	public List<Person> listOfDoctors = new List<Person>(); 
+	public List<Person> listOfPatients = new List<Person>();
 
 	// Use this to POST and get a login
 	public IEnumerator LOGINUser () {
@@ -40,12 +45,54 @@ public class NetworkREST  : MonoBehaviour {
 		R = JSONNode.Parse(result);
 		Debug.Log("The token is " + R["token"]);
 		token = R ["token"];
-		StartCoroutine(GETUser(2));
+
+		// Now we write the token somewhere offline, so if we crash we are gucci.
+
+		StartCoroutine(GETUserList());
+	}
+
+	// Use this to GET the list of users
+	public IEnumerator GETUserList () {
+		Dictionary<string, string> headers = new Dictionary<string, string>();
+		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+		Debug.Log("The header text is " + token_string);;
+		headers.Add( "Authorization",  token_string);
+
+		WWW userData = new WWW (baseURL + "/api/v1/users", null, headers);
+		yield return userData;
+		Debug.Log("The returned list of users is " + userData.text);;
+
+		JSONNode R = new JSONClass(); // Start with JSONArray or JSONClass
+		R = JSONNode.Parse(userData.text);
+
+		Debug.Log("The name of the first retrived user is " + R ["users"][0]["email"]);
+		Debug.Log("There are " + R["users"].Count + " elements in the array");
+
+		// let's populate an array accessible from outside
+		for (int i = 0; i <= R["users"].Count; i++)
+		{
+			Debug.Log ("Just testing");
+			int local_age = 0;
+			if (R ["users"] [i] ["age"] != null) 
+			{
+				local_age = Int32.Parse (R ["users"] [i] ["age"]);
+			}
+			listOfDoctors.Add(new Person()
+				{
+					ID = R ["users"][i]["id"],
+					name = R ["users"][i]["complete_name"],
+					age = local_age,
+					type = Person.Type.Doctor,
+					photo = R ["users"][i]["avatar"]
+				}
+			);
+		}
+
 	}
 
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-	//---------------------------------------------------------------------
+	//---------------  DOWN HERE ARE JUST TEST METHODS  -------------------
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 
@@ -65,13 +112,7 @@ public class NetworkREST  : MonoBehaviour {
 //		Debug.Log("The name of the retrived user is " + R["name"]);;
 	}
 
-	// Use this to GET the users list
-	IEnumerator GETUsersList () {
-		WWW userListData = new WWW (baseURL + "/api/v1/users");
-		yield return userListData;
-		string userListDataString = userListData.text;
-		print (userListDataString);
-	}
+
 
 	// Use this to GET single patient data
 	IEnumerator GETPatient (int patientID) {
