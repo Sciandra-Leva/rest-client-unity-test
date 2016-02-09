@@ -27,5 +27,7 @@ public class TestNetworkScript : MonoBehaviour {
 		// two lists
 //		StartCoroutine(client.GETUsersList());
 //		StartCoroutine(client.GETPatientsList());
+
+		StartCoroutine(client.LOGOUTUser());
 	}
 }

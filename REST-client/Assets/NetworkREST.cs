@@ -13,8 +13,13 @@ public class NetworkREST  : MonoBehaviour {
 	static string baseURL = "http://localhost:3000"; 
 	static string post_url = baseURL + "/api/v1/users";
 	static string login_url = baseURL + "/api/v1/sessions";
-	static string exercise_root = baseURL + "";
+//	static string exercise_root = baseURL + "";
+
 	private string token = "";
+	private bool inLogin = false;
+	private bool inGETListUsers = false;
+	private bool inGETListPatients = false;
+
 
 //	public string login_email = "sciandra@leva.io";
 //	public string login_password = "Sementera";
@@ -32,6 +37,8 @@ public class NetworkREST  : MonoBehaviour {
 
 		JSONNode N = new JSONClass(); // Start with JSONArray or JSONClass
 
+		inLogin = true;
+
 		N["user"]["email"] = login_email;
 		N["user"]["password"] = login_password;
 
@@ -45,6 +52,7 @@ public class NetworkREST  : MonoBehaviour {
 			client.Headers[HttpRequestHeader.ContentType] = "application/json";
 			yield return result = client.UploadString(login_url, "POST", json_test);
 		}
+		inLogin = false;
 		Debug.Log(result);
 		JSONNode R = new JSONClass(); // Start with JSONArray or JSONClass
 		R = JSONNode.Parse(result);
@@ -56,9 +64,61 @@ public class NetworkREST  : MonoBehaviour {
 		StartCoroutine(GETUsersList());
 		StartCoroutine(GETPatientsList());
 	}
+		
+
+	// Use this to DELETE and do a logout
+	public IEnumerator LOGOUTUser () {
+		while(inLogin || inGETListUsers || inGETListPatients)       
+			yield return new WaitForSeconds(0.1f);
+
+		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+			
+		Debug.Log("Fin qua arrivo");
+
+		try
+		{
+			HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(login_url);
+
+			myHttpWebRequest.Method = "DELETE";
+			myHttpWebRequest.Headers.Add("Authorization", token_string);
+			// Sends the HttpWebRequest and waits for the response.			
+			HttpWebResponse myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse(); 
+			// Gets the stream associated with the response.
+			Stream receiveStream = myHttpWebResponse.GetResponseStream();
+			Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+			// Pipes the stream to a higher level stream reader with the required encoding format. 
+			StreamReader readStream = new StreamReader( receiveStream, encode );
+			Debug.Log("\r\nResponse stream received.");
+			Char[] read = new Char[256];
+			// Reads 256 characters at a time.    
+			int count = readStream.Read( read, 0, 256 );
+			Debug.Log("HTML...\r\n");
+			while (count > 0) 
+			{
+				// Dumps the 256 characters on a string and displays the string to the console.
+				String str = new String(read, 0, count);
+				Debug.Log(str);
+				count = readStream.Read(read, 0, 256);
+			}
+			Debug.Log("");
+			// Releases the resources of the response.
+			myHttpWebResponse.Close();
+			// Releases the resources of the Stream.
+			readStream.Close();
+		}
+		catch
+		{
+			Debug.Log("Error");
+		}
+
+	}
+
 
 	// Use this to GET the list of users
 	public IEnumerator GETUsersList () {
+
+		inGETListUsers = true;
+
 		Dictionary<string, string> headers = new Dictionary<string, string>();
 		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 		Debug.Log("The header text is " + token_string);;
@@ -67,6 +127,8 @@ public class NetworkREST  : MonoBehaviour {
 		WWW usersData = new WWW (baseURL + "/api/v1/users", null, headers);
 		yield return usersData;
 		Debug.Log("The returned list of users is " + usersData.text);;
+
+		inGETListUsers = false;
 
 		JSONNode R_users = new JSONClass(); // Start with JSONArray or JSONClass
 		R_users = JSONNode.Parse(usersData.text);
@@ -97,6 +159,9 @@ public class NetworkREST  : MonoBehaviour {
 
 	// Use this to GET the list of patients
 	public IEnumerator GETPatientsList () {
+
+		inGETListPatients = true;
+
 		Dictionary<string, string> headers = new Dictionary<string, string>();
 		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 		Debug.Log("The header text is " + token_string);;
@@ -105,6 +170,8 @@ public class NetworkREST  : MonoBehaviour {
 		WWW patientsData = new WWW (baseURL + "/api/v1/patients", null, headers);
 		yield return patientsData;
 		Debug.Log("The returned list of patients is " + patientsData.text);;
+
+		inGETListPatients = false;
 
 		JSONNode R_patients = new JSONClass(); // Start with JSONArray or JSONClass
 		R_patients = JSONNode.Parse(patientsData.text);
