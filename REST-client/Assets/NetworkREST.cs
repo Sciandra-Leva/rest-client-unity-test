@@ -10,17 +10,22 @@ using SimpleJSON;
 
 public class NetworkREST  : MonoBehaviour {
 
-	public string baseURL = "http://localhost:3000"; 
-	public string post_url = "http://localhost:3000/api/v1/users";
-	public string login_url = "http://localhost:3000/api/v1/sessions";
-	public string exercise_root = "";
-	public string token = "";
+	static string baseURL = "http://localhost:3000"; 
+	static string post_url = baseURL + "/api/v1/users";
+	static string login_url = baseURL + "/api/v1/sessions";
+	static string exercise_root = baseURL + "";
+	private string token = "";
 
-	public string login_email = "sciandra@leva.io";
-	public string login_password = "Sementera";
+//	public string login_email = "sciandra@leva.io";
+//	public string login_password = "Sementera";
+	public string login_email = "";
+	public string login_password = "";
 
 	public List<Person> listOfDoctors = new List<Person>(); 
 	public List<Person> listOfPatients = new List<Person>();
+
+	// TO DO: a check connection method, in order to screw up later
+
 
 	// Use this to POST and get a login
 	public IEnumerator LOGINUser () {
@@ -48,42 +53,80 @@ public class NetworkREST  : MonoBehaviour {
 
 		// Now we write the token somewhere offline, so if we crash we are gucci.
 
-		StartCoroutine(GETUserList());
+		StartCoroutine(GETUsersList());
+		StartCoroutine(GETPatientsList());
 	}
 
 	// Use this to GET the list of users
-	public IEnumerator GETUserList () {
+	public IEnumerator GETUsersList () {
 		Dictionary<string, string> headers = new Dictionary<string, string>();
 		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 		Debug.Log("The header text is " + token_string);;
 		headers.Add( "Authorization",  token_string);
 
-		WWW userData = new WWW (baseURL + "/api/v1/users", null, headers);
-		yield return userData;
-		Debug.Log("The returned list of users is " + userData.text);;
+		WWW usersData = new WWW (baseURL + "/api/v1/users", null, headers);
+		yield return usersData;
+		Debug.Log("The returned list of users is " + usersData.text);;
 
-		JSONNode R = new JSONClass(); // Start with JSONArray or JSONClass
-		R = JSONNode.Parse(userData.text);
+		JSONNode R_users = new JSONClass(); // Start with JSONArray or JSONClass
+		R_users = JSONNode.Parse(usersData.text);
 
-		Debug.Log("The name of the first retrived user is " + R ["users"][0]["email"]);
-		Debug.Log("There are " + R["users"].Count + " elements in the array");
+		Debug.Log("The name of the first retrived user is " + R_users ["users"][0]["complete_name"]);
+		Debug.Log("There are " + R_users["users"].Count + " elements in the array");
 
 		// let's populate an array accessible from outside
-		for (int i = 0; i <= R["users"].Count; i++)
+		for (int i = 0; i <= R_users["users"].Count; i++)
 		{
-			Debug.Log ("Just testing");
 			int local_age = 0;
-			if (R ["users"] [i] ["age"] != null) 
+			if (R_users ["users"] [i] ["age"] != null) 
 			{
-				local_age = Int32.Parse (R ["users"] [i] ["age"]);
+				local_age = Int32.Parse (R_users ["users"] [i] ["age"]);
 			}
 			listOfDoctors.Add(new Person()
 				{
-					ID = R ["users"][i]["id"],
-					name = R ["users"][i]["complete_name"],
+					ID = R_users ["users"][i]["id"],
+					name = R_users ["users"][i]["complete_name"],
 					age = local_age,
 					type = Person.Type.Doctor,
-					photo = R ["users"][i]["avatar"]
+					photo = R_users ["users"][i]["avatar"]
+				}
+			);
+		}
+
+	}
+
+	// Use this to GET the list of patients
+	public IEnumerator GETPatientsList () {
+		Dictionary<string, string> headers = new Dictionary<string, string>();
+		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+		Debug.Log("The header text is " + token_string);;
+		headers.Add( "Authorization",  token_string);
+
+		WWW patientsData = new WWW (baseURL + "/api/v1/patients", null, headers);
+		yield return patientsData;
+		Debug.Log("The returned list of patients is " + patientsData.text);;
+
+		JSONNode R_patients = new JSONClass(); // Start with JSONArray or JSONClass
+		R_patients = JSONNode.Parse(patientsData.text);
+
+		Debug.Log("The name of the first retrived patient is " + R_patients ["patients"][0]["complete_name"]);
+		Debug.Log("There are " + R_patients["patients"].Count + " elements in the array");
+
+		// let's populate an array accessible from outside
+		for (int i = 0; i <= R_patients["patients"].Count; i++)
+		{
+			int local_age = 0;
+			if (R_patients["patients"] [i] ["age"] != null) 
+			{
+				local_age = Int32.Parse (R_patients ["patients"] [i] ["age"]);
+			}
+			listOfPatients.Add(new Person()
+				{
+					ID = R_patients ["patients"][i]["id"],
+					name = R_patients ["patients"][i]["complete_name"],
+					age = local_age,
+					type = Person.Type.Patient,
+					photo = R_patients ["patients"][i]["avatar"]
 				}
 			);
 		}
@@ -95,40 +138,6 @@ public class NetworkREST  : MonoBehaviour {
 	//---------------  DOWN HERE ARE JUST TEST METHODS  -------------------
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-
-
-	// Use this to GET single user data
-	public IEnumerator GETUser (int userID) {
-		Dictionary<string, string> headers = new Dictionary<string, string>();
-		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
-		Debug.Log("The header text is " + token_string);;
-		headers.Add( "Authorization",  token_string);
-
-		WWW userData = new WWW (baseURL + "/api/v1/users/" + userID.ToString(), null, headers);
-		yield return userData;
-		Debug.Log("The returned text is " + userData.text);;
-//		JSONNode R = new JSONClass(); // Start with JSONArray or JSONClass
-//		R = JSONNode.Parse(userData.text);
-//		Debug.Log("The name of the retrived user is " + R["name"]);;
-	}
-
-
-
-	// Use this to GET single patient data
-	IEnumerator GETPatient (int patientID) {
-		WWW patientData = new WWW (baseURL + "/api/v1/patients/" + patientID.ToString());
-		yield return patientData;
-		string patientDataString = patientData.text;
-		print (patientDataString);
-	}
-
-	// Use this to GET the patients list
-	IEnumerator GETPatientsList () {
-		WWW patientListData = new WWW (baseURL + "/api/v1/patients");
-		yield return patientListData;
-		string patientListDataString = patientListData.text;
-		print (patientListDataString);
-	}
 
 	// Use this to POST a new user
 	IEnumerator POSTUser () {
