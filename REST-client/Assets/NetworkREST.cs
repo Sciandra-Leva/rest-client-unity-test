@@ -16,6 +16,7 @@ public class NetworkREST  : MonoBehaviour {
 //	static string exercise_root = baseURL + "";
 
 	private string token = "";
+	public bool loggedOut = false;
 	private bool inLogin = false;
 	private bool inGETListUsers = false;
 	private bool inGETListPatients = false;
@@ -26,8 +27,8 @@ public class NetworkREST  : MonoBehaviour {
 	public string login_email = "";
 	public string login_password = "";
 
-	public List<Person> listOfDoctors = new List<Person>(); 
-	public List<Person> listOfPatients = new List<Person>();
+	public List<Person> listOfDoctors; 
+	public List<Person> listOfPatients;
 
 	// TO DO: a check connection method, in order to screw up later
 
@@ -73,8 +74,6 @@ public class NetworkREST  : MonoBehaviour {
 
 		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 			
-		Debug.Log("Fin qua arrivo");
-
 		try
 		{
 			HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(login_url);
@@ -92,7 +91,6 @@ public class NetworkREST  : MonoBehaviour {
 			Char[] read = new Char[256];
 			// Reads 256 characters at a time.    
 			int count = readStream.Read( read, 0, 256 );
-			Debug.Log("HTML...\r\n");
 			while (count > 0) 
 			{
 				// Dumps the 256 characters on a string and displays the string to the console.
@@ -100,7 +98,13 @@ public class NetworkREST  : MonoBehaviour {
 				Debug.Log(str);
 				count = readStream.Read(read, 0, 256);
 			}
-			Debug.Log("");
+
+			Debug.Log("To test the freshly populated arrays: First Patient registered: " + 
+				listOfPatients.ElementAt(0).name +
+				" and the first Doctor registered: " +
+				listOfDoctors.ElementAt(0).name
+			);
+
 			// Releases the resources of the response.
 			myHttpWebResponse.Close();
 			// Releases the resources of the Stream.
@@ -108,7 +112,7 @@ public class NetworkREST  : MonoBehaviour {
 		}
 		catch
 		{
-			Debug.Log("Error");
+			Debug.Log("Error in the DELETE!");
 		}
 
 	}
@@ -118,6 +122,7 @@ public class NetworkREST  : MonoBehaviour {
 	public IEnumerator GETUsersList () {
 
 		inGETListUsers = true;
+		listOfDoctors = new List<Person>();
 
 		Dictionary<string, string> headers = new Dictionary<string, string>();
 		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
@@ -150,7 +155,7 @@ public class NetworkREST  : MonoBehaviour {
 					name = R_users ["users"][i]["complete_name"],
 					age = local_age,
 					type = Person.Type.Doctor,
-					photo = R_users ["users"][i]["avatar"]
+					photo = baseURL + R_users ["users"][i]["avatar"]
 				}
 			);
 		}
@@ -161,6 +166,7 @@ public class NetworkREST  : MonoBehaviour {
 	public IEnumerator GETPatientsList () {
 
 		inGETListPatients = true;
+		listOfPatients = new List<Person> ();
 
 		Dictionary<string, string> headers = new Dictionary<string, string>();
 		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
@@ -193,7 +199,7 @@ public class NetworkREST  : MonoBehaviour {
 					name = R_patients ["patients"][i]["complete_name"],
 					age = local_age,
 					type = Person.Type.Patient,
-					photo = R_patients ["patients"][i]["avatar"]
+					photo = baseURL + R_patients ["patients"][i]["avatar"]
 				}
 			);
 		}

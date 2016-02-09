@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
+
 
 public class TestNetworkScript : MonoBehaviour {
 
@@ -28,6 +30,18 @@ public class TestNetworkScript : MonoBehaviour {
 //		StartCoroutine(client.GETUsersList());
 //		StartCoroutine(client.GETPatientsList());
 
+
+		// this is the one used to log out the 
+		// current user. It won't start if there is
+		// another call to the server running 
+		// but it should not happen. Ever.
 		StartCoroutine(client.LOGOUTUser());
+
+		// example of interaction
+//		Debug.Log("To test the freshly populated arrays: First Patient registered: " + 
+//			listOfPatients.ElementAt(0).name +
+//			" and the first Doctor registered: " +
+//			listOfDoctors.ElementAt(0).name
+//		);
 	}
 }
