@@ -30,32 +30,45 @@ public class NetworkREST  : MonoBehaviour {
 	// TO DO: a check connection method, in order to screw up later
 		
 			
-	// Use this to POST and get a login
-	public IEnumerator LOGINUser (string email, string password) {
+	// Use this to do a POST and create a session
+	public IEnumerator LOGINUser (string email, string password, string error) {
 
+		// I need to store those informations for other calls
 		login_email = email;
 		login_password = password;
 
-		JSONNode N = new JSONClass(); // Start with JSONArray or JSONClass
-
+		// create the JSON structure to send
+		JSONNode N = new JSONClass();
 		N["user"]["email"] = login_email;
 		N["user"]["password"] = login_password;
 
-		string json_test = N.ToString();
-
-		//		Debug.Log("Formatted JSON = " + json_test);
+		// and convert it to string
+		string json_parameters = N.ToString();
 
 		string result = "";
-		using (var client = new WebClient())
+
+		// the actual call, in a try catch
+		try 
 		{
-			client.Headers[HttpRequestHeader.ContentType] = "application/json";
-			yield return result = client.UploadString(login_url, "POST", json_test);
+			using (var client = new WebClient())
+			{
+				client.Headers[HttpRequestHeader.ContentType] = "application/json";
+				result = client.UploadString(login_url, "POST", json_parameters);
+			}
+		}
+		catch (Exception ex)
+		{
+			Debug.Log("exception: " + ex);
+			error = ex.ToString();
 		}
 
+		yield return result;
+
 		Debug.Log(result);
-		JSONNode R = new JSONClass(); // Start with JSONArray or JSONClass
+
+		// now I have to parse the json with the result
+		JSONNode R = new JSONClass();
 		R = JSONNode.Parse(result);
-		//		Debug.Log("The token is " + R["token"]);
 		token = R ["token"];
 
 	}
