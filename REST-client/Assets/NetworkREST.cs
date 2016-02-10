@@ -16,7 +16,8 @@ public enum RestError
 	ServerError,
 	TokenError,
 	ZeroDoctors,
-	ZeroPatients
+	ZeroPatients,
+	UnAuthorized
 }
 
 public enum RestSession
@@ -287,68 +288,120 @@ public class NetworkREST  : MonoBehaviour {
 
 	// Use this to DELETE and do a logout
 	public IEnumerator LOGOUTUser () {
+		bool allProper = true;
+
 		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
-		HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(login_url);
+		String answer_text = String.Empty;
 
-		myHttpWebRequest.Method = "DELETE";
-		myHttpWebRequest.Headers.Add("Authorization", token_string);
-		// Sends the HttpWebRequest and waits for the response.			
-		HttpWebResponse myHttpWebResponse;
-		yield return myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse(); 
-		// Gets the stream associated with the response.
-		Stream receiveStream = myHttpWebResponse.GetResponseStream();
-		Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-		// Pipes the stream to a higher level stream reader with the required encoding format. 
-		StreamReader readStream = new StreamReader( receiveStream, encode );
-		Char[] read = new Char[256];
-		// Reads 256 characters at a time.    
-		int count = readStream.Read( read, 0, 256 );
-		while (count > 0) 
+		HttpWebResponse myHttpWebResponse = null;
+		try
 		{
-			// Dumps the 256 characters on a string and displays the string to the console.
-			String str = new String(read, 0, count);
-			Debug.Log(str);
-			count = readStream.Read(read, 0, 256);
+			HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(login_url);
+
+			myHttpWebRequest.Method = "DELETE";
+			myHttpWebRequest.Headers.Add("Authorization", token_string);
+			// Sends the HttpWebRequest and waits for the response.			
+			myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse(); 
+			// Gets the stream associated with the response.
+			Stream receiveStream = myHttpWebResponse.GetResponseStream();
+			Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+			// Pipes the stream to a higher level stream reader with the required encoding format. 
+			StreamReader readStream = new StreamReader( receiveStream, encode );
+			answer_text = readStream.ReadToEnd();
+
+			// Releases the resources of the response.
+			myHttpWebResponse.Close();
+			// Releases the resources of the Stream.
+			readStream.Close();
+		}
+		catch (WebException ex)
+		{
+			Debug.Log("exception: " + ex);
+			var response = ex.Response as HttpWebResponse;
+			if (response != null)
+			{
+				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+			}
+			switch ((int)response.StatusCode) {
+				// I don't really have many ideas about the kind of error here
+			case 401:
+				errorHandler = RestError.UnAuthorized;
+				break;
+			case 500:
+				errorHandler = RestError.ServerError;
+				break;
+			default:
+				Debug.Log ("OH SHIT");
+				break;
+			}
+			allProper = false;
 		}
 
-		// Releases the resources of the response.
-		myHttpWebResponse.Close();
-		// Releases the resources of the Stream.
-		readStream.Close();
+		yield return myHttpWebResponse;
+		if (allProper) 
+		{
+			Debug.Log (answer_text);
+		}
 	}
 
 	// Use this to DELETE and force a logout
 	public IEnumerator ForceLOGOUTUser () {
+		bool allProper = true;
 		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
-		HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(force_logout_url);
+		String answer_text = String.Empty;
 
-		myHttpWebRequest.Method = "DELETE";
-		myHttpWebRequest.Headers.Add("Authorization", token_string);
-		// Sends the HttpWebRequest and waits for the response.			
-		HttpWebResponse myHttpWebResponse;
-		yield return myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse(); 
-		// Gets the stream associated with the response.
-		Stream receiveStream = myHttpWebResponse.GetResponseStream();
-		Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-		// Pipes the stream to a higher level stream reader with the required encoding format. 
-		StreamReader readStream = new StreamReader( receiveStream, encode );
-		Char[] read = new Char[256];
-		// Reads 256 characters at a time.    
-		int count = readStream.Read( read, 0, 256 );
-		while (count > 0) 
+		HttpWebResponse myHttpWebResponse = null;
+		try
 		{
-			// Dumps the 256 characters on a string and displays the string to the console.
-			String str = new String(read, 0, count);
-			Debug.Log(str);
-			count = readStream.Read(read, 0, 256);
+			HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(force_logout_url);
+
+			myHttpWebRequest.Method = "DELETE";
+			myHttpWebRequest.Headers.Add("Authorization", token_string);
+			// Sends the HttpWebRequest and waits for the response.			
+			myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse(); 
+			// Gets the stream associated with the response.
+			Stream receiveStream = myHttpWebResponse.GetResponseStream();
+			Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+			// Pipes the stream to a higher level stream reader with the required encoding format. 
+			StreamReader readStream = new StreamReader( receiveStream, encode );
+			answer_text = readStream.ReadToEnd();
+
+			// Releases the resources of the response.
+			myHttpWebResponse.Close();
+			// Releases the resources of the Stream.
+			readStream.Close();
+		}
+		catch (WebException ex)
+		{
+			Debug.Log("exception: " + ex);
+			var response = ex.Response as HttpWebResponse;
+			if (response != null)
+			{
+				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+			}
+			switch ((int)response.StatusCode) {
+			// I don't really have many ideas about the kind of error here
+			case 401:
+				errorHandler = RestError.UnAuthorized;
+				break;
+			case 500:
+				errorHandler = RestError.ServerError;
+				break;
+			default:
+				Debug.Log ("OH SHIT");
+				break;
+			}
+			allProper = false;
+
 		}
 
-		// Releases the resources of the response.
-		myHttpWebResponse.Close();
-		// Releases the resources of the Stream.
-		readStream.Close();
+		yield return myHttpWebResponse;
+		if (allProper) 
+		{
+			Debug.Log (answer_text);
+		}
 	}
 
 

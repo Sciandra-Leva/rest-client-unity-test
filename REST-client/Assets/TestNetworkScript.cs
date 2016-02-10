@@ -21,7 +21,7 @@ public class TestNetworkScript : MonoBehaviour {
 		// before the login has been done)
 		yield return StartCoroutine(client.LOGINUser ("sciandra@leva.io", "Sementera"));
 
-		if (client.errorHandler != RestError.AllGood) 
+		if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
 		{
 			Debug.Log ("There has been an error: " + client.errorHandler);
 		} 
@@ -44,9 +44,18 @@ public class TestNetworkScript : MonoBehaviour {
 			// list can be used
 			List<Person> listOfDoctors = new List<Person> (); 
 			yield return StartCoroutine(client.GETUsersList(listOfDoctors));
+		
+			if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
+			{
+				Debug.Log ("There has been an error: " + client.errorHandler);
+			} 
 
 			List<Person> listOfPatients = new List<Person> ();
 			yield return StartCoroutine(client.GETPatientsList(listOfPatients));
+			if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
+			{
+				Debug.Log ("There has been an error: " + client.errorHandler);
+			} 
 
 			// testing the populated lists with Linq
 			Debug.Log("To test the freshly populated lists: " +
@@ -59,6 +68,11 @@ public class TestNetworkScript : MonoBehaviour {
 			// this is the one used to log out the 
 			// current user.
 			yield return StartCoroutine(client.LOGOUTUser());	
+			if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
+			{
+				Debug.Log ("There has been an error: " + client.errorHandler);
+			} 
+
 		}
 	}
 }
