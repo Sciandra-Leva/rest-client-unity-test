@@ -473,6 +473,10 @@ public class NetworkREST  : MonoBehaviour {
 		}
 	}
 
+	//---------------------------------------------------------------------
+	//------------------------  TESTING METHODS  --------------------------
+	//---------------------------------------------------------------------
+
 	// Use this to do a POST and create a session
 	public IEnumerator POSTExercise () {
 
