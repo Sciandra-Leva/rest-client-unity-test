@@ -1,4 +1,13 @@
-﻿using UnityEngine;
+﻿//---------------------------------------------------------------------
+//--------------------------  NetworkREST  ----------------------------
+// A small library to handle communication with our RESTful services
+// in the backend server.
+// Developed by: Lorenzo Sciandra
+// v0.1
+//---------------------------------------------------------------------
+
+
+using UnityEngine;
 using System;
 using System.Linq;
 using System.Collections;
@@ -33,11 +42,12 @@ public class NetworkREST  : MonoBehaviour {
 	//---------------------------  VARIABLES  -----------------------------
 	//---------------------------------------------------------------------
 
-	static string baseURL = "http://localhost:3000"; 
-	static string post_url = baseURL + "/api/v1/users";
+//	static string baseURL = "http://dev.painteraction.org";
+	static string baseURL = "http://localhost:3000";
+//	static string post_url = baseURL + "/api/v1/users";
 	static string login_url = baseURL + "/api/v1/sessions";
 	static string force_logout_url = baseURL + "/api/v1/force_logout";
-//	static string exercise_root = baseURL + "";
+	static string exercise_url = baseURL + "/api/v1/exercises";
 
 	private string token = "";
 	private string login_email = "";
@@ -46,6 +56,7 @@ public class NetworkREST  : MonoBehaviour {
 	public RestError errorHandler = RestError.AllGood;
 	public RestSession sessionsHandler = RestSession.AllGood;
 
+	public string exercise_root = "/Users/lorenzosciandra/Documents/workspace-testing-lorenzo/unity-projects/rest-client-testing/REST-client/Assets";
 
 	//---------------------------------------------------------------------
 	//-------------------------  PUBLIC METHODS  --------------------------
@@ -404,50 +415,124 @@ public class NetworkREST  : MonoBehaviour {
 		}
 	}
 
+	// Use this to DELETE and do a logout
+	public void FinalLOGOUTUser () {
+		bool allProper = true;
 
-	//---------------------------------------------------------------------
-	//-------------------------  PRIVATE METHODS  -------------------------
-	//---------------------------------------------------------------------
+		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
+		String answer_text = String.Empty;
 
-	//---------------------------------------------------------------------
-	//---------------------------------------------------------------------
-	//---------------  DOWN HERE ARE JUST TEST METHODS  -------------------
-	//---------------------------------------------------------------------
-	//---------------------------------------------------------------------
+		HttpWebResponse myHttpWebResponse = null;
+		try
+		{
+			HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(login_url);
 
-	// Use this to POST a new user
-	IEnumerator POSTUser () {
+			myHttpWebRequest.Method = "DELETE";
+			myHttpWebRequest.Headers.Add("Authorization", token_string);
+			// Sends the HttpWebRequest and waits for the response.			
+			myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse(); 
+			// Gets the stream associated with the response.
+			Stream receiveStream = myHttpWebResponse.GetResponseStream();
+			Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+			// Pipes the stream to a higher level stream reader with the required encoding format. 
+			StreamReader readStream = new StreamReader( receiveStream, encode );
+			answer_text = readStream.ReadToEnd();
 
-		JSONNode N = new JSONClass(); // Start with JSONArray or JSONClass
+			// Releases the resources of the response.
+			myHttpWebResponse.Close();
+			// Releases the resources of the Stream.
+			readStream.Close();
+		}
+		catch (WebException ex)
+		{
+			Debug.Log("exception: " + ex);
+			var response = ex.Response as HttpWebResponse;
+			if (response != null)
+			{
+				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+			}
+			switch ((int)response.StatusCode) {
+			// I don't really have many ideas about the kind of error here
+			case 401:
+				errorHandler = RestError.UnAuthorized;
+				break;
+			case 500:
+				errorHandler = RestError.ServerError;
+				break;
+			default:
+				Debug.Log ("OH SHIT");
+				break;
+			}
+			allProper = false;
+		}
 
-		N["user"]["name"] = "Another";
-		N["user"]["surname"] = "Test";
-		N["user"]["email"] = "mc@test.test";
-		N["user"]["password"] = "Sementera";
-		N["user"]["role"] = "Admin";
+		if (allProper) 
+		{
+			Debug.Log (answer_text);
+		}
+	}
 
-		string json_test = N.ToString();
+	// Use this to do a POST and create a session
+	public IEnumerator POSTExercise () {
 
-		Debug.Log("Formatted JSON = " + json_test);
+		bool allProper = true;
+
+		// 
+
+		// create the JSON structure to send
+		JSONNode N = new JSONClass();
+		N["user"]["email"] = login_email;
+		N["user"]["password"] = login_password;
+
+		// and convert it to string
+		string json_parameters = N.ToString();
 
 		string result = "";
-		using (var client = new WebClient())
+
+		// the actual call, in a try catch
+		try 
 		{
-			client.Headers[HttpRequestHeader.ContentType] = "application/json";
-//			try{
-//				yield return result = client.UploadString(post_url, "POST", json_test);
-//			}
-//			catch (WebException x)
-//			{
-//				// we can end here, to say, when the user is already registered or some shit
-//				// btw it can't happen in our REST server
-//				Debug.Log ("Error: " + x.Message);
-//			}
-			yield return result = client.UploadString(post_url, "POST", json_test);
+			using (var client = new WebClient())
+			{
+				client.Headers[HttpRequestHeader.ContentType] = "application/json";
+				result = client.UploadString(exercise_url, "POST", json_parameters);
+			}
 		}
-		Debug.Log(result);
+		catch (WebException ex)
+		{
+			Debug.Log("exception: " + ex);
+			var response = ex.Response as HttpWebResponse;
+			if (response != null)
+			{
+				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+			}
+
+			switch ((int)response.StatusCode) {
+
+			case 400:
+				errorHandler = RestError.WrongMail;
+				break;
+			case 401:
+				errorHandler = RestError.WrongPassword;
+				break;
+			case 500:
+				errorHandler = RestError.ServerError;
+				break;
+			default:
+				Debug.Log ("OH SHIT");
+				break;
+			}
+			allProper = false;
+		}
+
+		yield return result;
+
+		if (allProper) 
+		{
+			Debug.Log(result);
+		}
+
 	}
-		
 }
 

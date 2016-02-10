@@ -62,17 +62,27 @@ public class TestNetworkScript : MonoBehaviour {
 				"First Patient registered: " + 
 				listOfPatients.ElementAt(0).name +
 				" and the first Doctor registered: " +
-				listOfDoctors.ElementAt(0).name
+				listOfDoctors.ElementAt(0).photo
 			);
 
 			// this is the one used to log out the 
 			// current user.
-			yield return StartCoroutine(client.LOGOUTUser());	
-			if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
-			{
-				Debug.Log ("There has been an error: " + client.errorHandler);
-			} 
+//			yield return StartCoroutine(client.LOGOUTUser());	
+//			if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
+//			{
+//				Debug.Log ("There has been an error: " + client.errorHandler);
+//			} 
 
 		}
 	}
+
+	void OnDestroy()
+	{
+		client.FinalLOGOUTUser ();
+		if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
+		{
+			Debug.Log ("There has been an error: " + client.errorHandler);
+		} 
+	}
+
 }
