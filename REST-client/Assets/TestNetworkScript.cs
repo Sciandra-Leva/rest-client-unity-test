@@ -19,9 +19,7 @@ public class TestNetworkScript : MonoBehaviour {
 		// to avoid slowing down the process. the yield return is simply
 		// to show how to avoid running ahead of time (ex: doing the gets 
 		// before the login has been done)
-		yield return StartCoroutine(client.LOGINUser ("sciandra@leva.io", "Sementa"));
-
-		Debug.Log("error = " + client.errorHandler);
+		yield return StartCoroutine(client.LOGINUser ("sciandra@leva.io", "Sementera"));
 
 		if (client.errorHandler != RestError.AllGood) 
 		{
@@ -29,10 +27,11 @@ public class TestNetworkScript : MonoBehaviour {
 		} 
 		else if (client.sessionsHandler == RestSession.MultipleActive) 
 		{
+			Debug.Log ("There are multiple sessions with this user");
 			// you may want to do something when multiple session are active...
 			// like invoking this to force all logouts
 
-			// yield return StartCoroutine(client.ForceLOGOUTUser());
+			yield return StartCoroutine(client.ForceLOGOUTUser());
 
 			// which of course requires that you do a new login...
 		}
