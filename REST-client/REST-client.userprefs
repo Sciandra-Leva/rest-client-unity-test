@@ -2,8 +2,8 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/NetworkREST.cs">
     <Files>
-      <File FileName="Assets/Person.cs" Line="36" Column="19" />
-      <File FileName="Assets/NetworkREST.cs" Line="75" Column="1" />
+      <File FileName="Assets/TestNetworkScript.cs" Line="16" Column="3" />
+      <File FileName="Assets/NetworkREST.cs" Line="71" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

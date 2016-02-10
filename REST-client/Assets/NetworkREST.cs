@@ -8,6 +8,21 @@ using System.IO;
 using System.Text;
 using SimpleJSON;
 
+public enum RestError
+{
+	AllGood,
+	WrongMail,
+	WrongPassword,
+	ServerError,
+}
+
+public enum RestSession
+{
+	AllGood,
+	MultipleActive
+}
+
+
 public class NetworkREST  : MonoBehaviour {
 
 	//---------------------------------------------------------------------
@@ -17,11 +32,16 @@ public class NetworkREST  : MonoBehaviour {
 	static string baseURL = "http://localhost:3000"; 
 	static string post_url = baseURL + "/api/v1/users";
 	static string login_url = baseURL + "/api/v1/sessions";
+	static string force_logout_url = baseURL + "/api/v1/force_logout";
 //	static string exercise_root = baseURL + "";
 
 	private string token = "";
 	private string login_email = "";
 	private string login_password = "";
+
+	public RestError errorHandler = RestError.AllGood;
+	public RestSession sessionsHandler = RestSession.AllGood;
+
 
 	//---------------------------------------------------------------------
 	//-------------------------  PUBLIC METHODS  --------------------------
@@ -31,7 +51,9 @@ public class NetworkREST  : MonoBehaviour {
 		
 			
 	// Use this to do a POST and create a session
-	public IEnumerator LOGINUser (string email, string password, string error) {
+	public IEnumerator LOGINUser (string email, string password) {
+
+		bool allProper = true;
 
 		// I need to store those informations for other calls
 		login_email = email;
@@ -56,20 +78,45 @@ public class NetworkREST  : MonoBehaviour {
 				result = client.UploadString(login_url, "POST", json_parameters);
 			}
 		}
-		catch (Exception ex)
+		catch (WebException ex)
 		{
 			Debug.Log("exception: " + ex);
-			error = ex.ToString();
+			var response = ex.Response as HttpWebResponse;
+			if (response != null)
+			{
+				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+			}
+
+			switch ((int)response.StatusCode) {
+
+			case 400:
+				errorHandler = RestError.WrongMail;
+				break;
+			case 401:
+				errorHandler = RestError.WrongPassword;
+				break;
+			case 500:
+				errorHandler = RestError.ServerError;
+				break;
+			default:
+				Debug.Log ("OH SHIT");
+				break;
+			}
+
+			Debug.Log("inside error = " + errorHandler.ToString());
+			allProper = false;
 		}
 
 		yield return result;
 
-		Debug.Log(result);
-
-		// now I have to parse the json with the result
-		JSONNode R = new JSONClass();
-		R = JSONNode.Parse(result);
-		token = R ["token"];
+		if (allProper) 
+		{
+			Debug.Log(result);
+			// now I have to parse the json with the result
+			JSONNode R = new JSONClass();
+			R = JSONNode.Parse(result);
+			token = R ["token"];
+		}
 
 	}
 
@@ -156,6 +203,40 @@ public class NetworkREST  : MonoBehaviour {
 		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
 		HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(login_url);
+
+		myHttpWebRequest.Method = "DELETE";
+		myHttpWebRequest.Headers.Add("Authorization", token_string);
+		// Sends the HttpWebRequest and waits for the response.			
+		HttpWebResponse myHttpWebResponse;
+		yield return myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse(); 
+		// Gets the stream associated with the response.
+		Stream receiveStream = myHttpWebResponse.GetResponseStream();
+		Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+		// Pipes the stream to a higher level stream reader with the required encoding format. 
+		StreamReader readStream = new StreamReader( receiveStream, encode );
+		Debug.Log("\r\nResponse stream received.");
+		Char[] read = new Char[256];
+		// Reads 256 characters at a time.    
+		int count = readStream.Read( read, 0, 256 );
+		while (count > 0) 
+		{
+			// Dumps the 256 characters on a string and displays the string to the console.
+			String str = new String(read, 0, count);
+			Debug.Log(str);
+			count = readStream.Read(read, 0, 256);
+		}
+
+		// Releases the resources of the response.
+		myHttpWebResponse.Close();
+		// Releases the resources of the Stream.
+		readStream.Close();
+	}
+
+	// Use this to DELETE and force a logout
+	public IEnumerator ForceLOGOUTUser () {
+		string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+
+		HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(force_logout_url);
 
 		myHttpWebRequest.Method = "DELETE";
 		myHttpWebRequest.Headers.Add("Authorization", token_string);
