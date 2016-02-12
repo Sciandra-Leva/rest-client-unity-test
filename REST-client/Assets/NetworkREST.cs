@@ -16,6 +16,8 @@ using System.Net;
 using System.IO;
 using System.Text;
 using SimpleJSON;
+using System.Xml;
+
 
 public enum RestError
 {
@@ -47,7 +49,11 @@ public class NetworkREST  : MonoBehaviour {
 //	static string post_url = baseURL + "/api/v1/users";
 	static string login_url = baseURL + "/api/v1/sessions";
 	static string force_logout_url = baseURL + "/api/v1/force_logout";
-	static string exercise_url = baseURL + "/api/v1/exercises";
+//	static string trails_url = baseURL + "/api/v1/trails";
+//	static string balls_url = baseURL + "/api/v1/balls";
+//	static string paints_url = baseURL + "/api/v1/paints";
+//	static string vowels_url = baseURL + "/api/v1/vowels";
+
 
 	private string token = "";
 	private string login_email = "";
@@ -478,64 +484,78 @@ public class NetworkREST  : MonoBehaviour {
 	//---------------------------------------------------------------------
 
 	// Use this to do a POST and create a session
-	public IEnumerator POSTExercise () {
+	// apparently for now I do one for each
+	public IEnumerator POSTTrailsExercise (string exercisePath) {
 
-		bool allProper = true;
+//		bool allProper = true;
+		TrailPreferences xmldata = new TrailPreferences ();
+		// let's start with the easy part: they tell me
+		// where the .xml is, I open it and read it
+//		XmlDocument xmldoc = new XmlDocument ();
+//		string mainFilePath = Application.persistentDataPath + "/main.xml";
+		string mainFilePath = exercisePath + "/main.xml";
+		Debug.Log ("The path i search for the xml is " + mainFilePath);
 
-		// 
+		if (System.IO.File.Exists (mainFilePath)) 
+		{
+			xmldata.LoadXML (mainFilePath);
+			Debug.Log ("I actually read it!");
+		}
+
+		// let's see if we can get here
 
 		// create the JSON structure to send
-		JSONNode N = new JSONClass();
-		N["user"]["email"] = login_email;
-		N["user"]["password"] = login_password;
-
-		// and convert it to string
-		string json_parameters = N.ToString();
-
+//		JSONNode N = new JSONClass();
+//		N["user"]["email"] = login_email;
+//		N["user"]["password"] = login_password;
+//
+//		// and convert it to string
+//		string json_parameters = N.ToString();
+//
 		string result = "";
-
-		// the actual call, in a try catch
-		try 
-		{
-			using (var client = new WebClient())
-			{
-				client.Headers[HttpRequestHeader.ContentType] = "application/json";
-				result = client.UploadString(exercise_url, "POST", json_parameters);
-			}
-		}
-		catch (WebException ex)
-		{
-			Debug.Log("exception: " + ex);
-			var response = ex.Response as HttpWebResponse;
-			if (response != null)
-			{
-				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-			}
-
-			switch ((int)response.StatusCode) {
-
-			case 400:
-				errorHandler = RestError.WrongMail;
-				break;
-			case 401:
-				errorHandler = RestError.WrongPassword;
-				break;
-			case 500:
-				errorHandler = RestError.ServerError;
-				break;
-			default:
-				Debug.Log ("OH SHIT");
-				break;
-			}
-			allProper = false;
-		}
-
+//
+//		// the actual call, in a try catch
+//		try 
+//		{
+//			using (var client = new WebClient())
+//			{
+//				client.Headers[HttpRequestHeader.ContentType] = "application/json";
+//				result = client.UploadString(exercise_url, "POST", json_parameters);
+//			}
+//		}
+//		catch (WebException ex)
+//		{
+//			Debug.Log("exception: " + ex);
+//			var response = ex.Response as HttpWebResponse;
+//			if (response != null)
+//			{
+//				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+//			}
+//
+//			switch ((int)response.StatusCode) {
+//
+//			case 400:
+//				errorHandler = RestError.WrongMail;
+//				break;
+//			case 401:
+//				errorHandler = RestError.WrongPassword;
+//				break;
+//			case 500:
+//				errorHandler = RestError.ServerError;
+//				break;
+//			default:
+//				Debug.Log ("OH SHIT");
+//				break;
+//			}
+//			allProper = false;
+//		}
+//
 		yield return result;
-
-		if (allProper) 
-		{
-			Debug.Log(result);
-		}
+//
+//		if (allProper) 
+//		{
+//			Debug.Log(result);
+//		}
 
 	}
 }

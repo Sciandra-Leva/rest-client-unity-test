@@ -62,7 +62,7 @@ public class TestNetworkScript : MonoBehaviour {
 				"First Patient registered: " + 
 				listOfPatients.ElementAt(0).name +
 				" and the first Doctor registered: " +
-				listOfDoctors.ElementAt(0).photo
+				listOfDoctors.ElementAt(0).name
 			);
 
 			// this is the one used to log out the 
@@ -72,6 +72,12 @@ public class TestNetworkScript : MonoBehaviour {
 //			{
 //				Debug.Log ("There has been an error: " + client.errorHandler);
 //			} 
+
+			// Ok, let's try now to get the post exercise to work.
+			string path_of_exercise = "/Users/lorenzosciandra/Documents/workspace-testing-lorenzo" +
+				"/unity-projects/rest-client-testing/REST-client/Assets/Sessions/20160203/AldoBo/" +
+				"TRAILS_1138";
+			yield return StartCoroutine(client.POSTTrailsExercise(path_of_exercise));
 
 		}
 	}
