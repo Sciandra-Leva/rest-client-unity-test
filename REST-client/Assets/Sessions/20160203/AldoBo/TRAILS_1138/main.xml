@@ -3,33 +3,12 @@
   <Session>
     <InitTime>2/3/2016 11:38:31 AM</InitTime>
     <EndTime>2/3/2016 11:39:46 AM</EndTime>
-    <PatientID>P0256</PatientID>
+    <PatientID>02</PatientID>
     <PatientName>AldoBo</PatientName>
     <DoctorsIDs>
-      <DocID>ewrtrew</DocID>
-      <DocID>D03</DocID>
-      <DocID>reter</DocID>
-      <DocID>D05</DocID>
-      <DocID>trytryrt</DocID>
-      <DocID>D03</DocID>
-      <DocID>iojpokpokp</DocID>
-      <DocID>D03</DocID>
-      <DocID>5651651</DocID>
-      <DocID>D03</DocID>
-      <DocID>516561</DocID>
-      <DocID>D05</DocID>
-      <DocID>rewt</DocID>
-      <DocID>D05</DocID>
-      <DocID>trewty</DocID>
-      <DocID>D03</DocID>
-      <DocID>1</DocID>
-      <DocID>D05</DocID>
-      <DocID>n</DocID>
-      <DocID>D05</DocID>
-      <DocID>v</DocID>
-      <DocID>D05</DocID>
-      <DocID>D01</DocID>
-      <DocID>D02</DocID>
+      <DocID>01</DocID>
+      <DocID>02</DocID>
+      <DocID>03</DocID>
     </DoctorsIDs>
   </Session>
   <background>

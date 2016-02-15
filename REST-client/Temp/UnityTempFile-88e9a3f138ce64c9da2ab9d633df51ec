@@ -78,6 +78,7 @@
 -define:UNITY_EDITOR_OSX
 'Assets/BgPreferences.cs'
 'Assets/NetworkREST.cs'
+'Assets/PIPars.cs'
 'Assets/Person.cs'
 'Assets/PhysicsPreferences.cs'
 'Assets/SimpleJSON.cs'

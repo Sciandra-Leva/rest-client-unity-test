@@ -49,7 +49,7 @@ public class NetworkREST  : MonoBehaviour {
 //	static string post_url = baseURL + "/api/v1/users";
 	static string login_url = baseURL + "/api/v1/sessions";
 	static string force_logout_url = baseURL + "/api/v1/force_logout";
-//	static string trails_url = baseURL + "/api/v1/trails";
+	static string trails_url = baseURL + "/api/v1/trails";
 //	static string balls_url = baseURL + "/api/v1/balls";
 //	static string paints_url = baseURL + "/api/v1/paints";
 //	static string vowels_url = baseURL + "/api/v1/vowels";
@@ -491,8 +491,6 @@ public class NetworkREST  : MonoBehaviour {
 		TrailPreferences xmldata = new TrailPreferences ();
 		// let's start with the easy part: they tell me
 		// where the .xml is, I open it and read it
-//		XmlDocument xmldoc = new XmlDocument ();
-//		string mainFilePath = Application.persistentDataPath + "/main.xml";
 		string mainFilePath = exercisePath + "/main.xml";
 		Debug.Log ("The path i search for the xml is " + mainFilePath);
 
@@ -501,26 +499,97 @@ public class NetworkREST  : MonoBehaviour {
 			xmldata.LoadXML (mainFilePath);
 			Debug.Log ("I actually read it!");
 		}
-
-		// let's see if we can get here
-
+		// since it's really working we can
 		// create the JSON structure to send
-//		JSONNode N = new JSONClass();
-//		N["user"]["email"] = login_email;
-//		N["user"]["password"] = login_password;
-//
-//		// and convert it to string
-//		string json_parameters = N.ToString();
-//
+		JSONNode N = new JSONClass();
+
+		N ["trails"] ["patient_id"] = TrailPreferences.patientID;
+		N ["trails"] ["time_to_live"] = TrailPreferences.trailsTimeToLive.ToString();
+
+		// I have to get all the doctors involved
+		// and pick out the first since it is the logged one
+		string list_of_doctors =  String.Join(", ", TrailPreferences.doctorsIDs.Skip(1).ToArray());
+		N["trails"]["other_doctors"] = "[" + list_of_doctors + "]";
+
+		N ["trails"] ["typology"] = TrailPreferences.trailsType;
+		N ["trails"] ["start_datetime"] = TrailPreferences.initTime;
+		N ["trails"] ["end_datetime"] = TrailPreferences.endTime;
+		N ["trails"] ["special_fx"] = TrailPreferences.trailsSpecialFX.ToString();
+
+		N ["trails"] ["enabled_therapist_left"] = TrailPreferences.othersSX_trailsEnabled.ToString();
+		if (TrailPreferences.othersSX_trailsEnabled == true) 
+		{
+			N["trails"]["therapist_left_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
+			N["trails"]["therapist_left_trail_color"]["a"] = TrailPreferences.othersSX_trailsColor.a.ToString();
+			N["trails"]["therapist_left_trail_color"]["r"] = TrailPreferences.othersSX_trailsColor.r.ToString();
+			N["trails"]["therapist_left_trail_color"]["g"] = TrailPreferences.othersSX_trailsColor.g.ToString();
+			N["trails"]["therapist_left_trail_color"]["b"] = TrailPreferences.othersSX_trailsColor.b.ToString();
+		}
+
+		N ["trails"] ["enabled_therapist_right"] = TrailPreferences.othersDX_trailsEnabled.ToString();
+		if (TrailPreferences.othersDX_trailsEnabled == true) 
+		{
+			N["trails"]["therapist_right_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
+			N["trails"]["therapist_right_trail_color"]["a"] = TrailPreferences.othersDX_trailsColor.a.ToString();
+			N["trails"]["therapist_right_trail_color"]["r"] = TrailPreferences.othersDX_trailsColor.r.ToString();
+			N["trails"]["therapist_right_trail_color"]["g"] = TrailPreferences.othersDX_trailsColor.g.ToString();
+			N["trails"]["therapist_right_trail_color"]["b"] = TrailPreferences.othersDX_trailsColor.b.ToString();
+		}
+
+		N ["trails"] ["enabled_patient_left"] = TrailPreferences.patientSX_trailsEnabled.ToString();
+		if (TrailPreferences.patientSX_trailsEnabled == true) 
+		{
+			N["trails"]["patient_left_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
+			N["trails"]["patient_left_trail_color"]["a"] = TrailPreferences.patientSX_trailsColor.a.ToString();
+			N["trails"]["patient_left_trail_color"]["r"] = TrailPreferences.patientSX_trailsColor.r.ToString();
+			N["trails"]["patient_left_trail_color"]["g"] = TrailPreferences.patientSX_trailsColor.g.ToString();
+			N["trails"]["patient_left_trail_color"]["b"] = TrailPreferences.patientSX_trailsColor.b.ToString();
+		}
+
+		N ["trails"] ["enabled_patient_right"] = TrailPreferences.patientDX_trailsEnabled.ToString();
+		if (TrailPreferences.patientDX_trailsEnabled == true) 
+		{
+			N["trails"]["patient_right_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
+			N["trails"]["patient_right_trail_color"]["a"] = TrailPreferences.patientDX_trailsColor.a.ToString();
+			N["trails"]["patient_right_trail_color"]["r"] = TrailPreferences.patientDX_trailsColor.r.ToString();
+			N["trails"]["patient_right_trail_color"]["g"] = TrailPreferences.patientDX_trailsColor.g.ToString();
+			N["trails"]["patient_right_trail_color"]["b"] = TrailPreferences.patientDX_trailsColor.b.ToString();
+		}
+
+		// now the part which is going to be a mess, about the backgrounds
+		if (TrailPreferences.backgroundIsImage == false) {
+			N ["trails"] ["background_color"] ["a"] = TrailPreferences.backgroundColor.a.ToString ();
+			N ["trails"] ["background_color"] ["r"] = TrailPreferences.backgroundColor.r.ToString ();
+			N ["trails"] ["background_color"] ["g"] = TrailPreferences.backgroundColor.g.ToString ();
+			N ["trails"] ["background_color"] ["b"] = TrailPreferences.backgroundColor.b.ToString ();
+		} 
+		else 
+		{
+			// I HAVE TO FIND A WAY TO UPLOAD IMAGES FFS
+		}
+
+		if (TrailPreferences.colorFilterEnabled == true) {
+			N ["trails"] ["color_filter"] ["a"] = TrailPreferences.colorFilterAlpha.ToString ();
+			N ["trails"] ["color_filter"] ["r"] = TrailPreferences.colorFilter.r.ToString ();
+			N ["trails"] ["color_filter"] ["g"] = TrailPreferences.colorFilter.g.ToString ();
+			N ["trails"] ["color_filter"] ["b"] = TrailPreferences.colorFilter.b.ToString ();
+		} 
+
+
+		// and convert it to string
+		string json_parameters = N.ToString();
+		Debug.Log ("This is what i wrote til aaaaaaand now: " + json_parameters);
 		string result = "";
-//
-//		// the actual call, in a try catch
+
+		// the actual call, in a try catch
 //		try 
 //		{
 //			using (var client = new WebClient())
 //			{
+//				string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+//				client.Headers[HttpRequestHeader.Authorization] = token_string;
 //				client.Headers[HttpRequestHeader.ContentType] = "application/json";
-//				result = client.UploadString(exercise_url, "POST", json_parameters);
+//				result = client.UploadString(trails_url, "POST", json_parameters);
 //			}
 //		}
 //		catch (WebException ex)
@@ -534,15 +603,15 @@ public class NetworkREST  : MonoBehaviour {
 //
 //			switch ((int)response.StatusCode) {
 //
-//			case 400:
-//				errorHandler = RestError.WrongMail;
-//				break;
-//			case 401:
-//				errorHandler = RestError.WrongPassword;
-//				break;
-//			case 500:
-//				errorHandler = RestError.ServerError;
-//				break;
+////			case 400:
+////				errorHandler = RestError.WrongMail;
+////				break;
+////			case 401:
+////				errorHandler = RestError.WrongPassword;
+////				break;
+////			case 500:
+////				errorHandler = RestError.ServerError;
+////				break;
 //			default:
 //				Debug.Log ("OH SHIT");
 //				break;

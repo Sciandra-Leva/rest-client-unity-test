@@ -164,10 +164,10 @@ public static bool backgroundIsImage = false;
     
     	xmlCompletePath = filename;
         
-    	//initTime = GetNodeFromXML("xml", "Session", "InitTime");
-    	//endTime = GetNodeFromXML("xml", "Session", "EndTime");
-    	//patientID = GetNodeFromXML("xml", "Session", "PatientID");
-    	//doctorsIDs = GetNodesFromXML("xml", "Session", "DoctorsIDs").ToList();
+    	initTime = GetNodeFromXML("xml", "Session", "InitTime");
+    	endTime = GetNodeFromXML("xml", "Session", "EndTime");
+    	patientID = GetNodeFromXML("xml", "Session", "PatientID");
+    	doctorsIDs = GetNodesFromXML("xml", "Session", "DoctorsIDs").ToList();
     	
     
     ////// Reading BG Layer Settings
