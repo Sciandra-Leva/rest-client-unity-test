@@ -1,12 +1,13 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/BgPreferences.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/NetworkREST.cs">
     <Files>
-      <File FileName="Assets/TestNetworkScript.cs" Line="72" Column="7" />
-      <File FileName="Assets/NetworkREST.cs" Line="502" Column="38" />
-      <File FileName="Assets/TrailPreferences.cs" Line="142" Column="7" />
-      <File FileName="Assets/BgPreferences.cs" Line="52" Column="51" />
+      <File FileName="Assets/TestNetworkScript.cs" Line="1" Column="1" />
+      <File FileName="Assets/NetworkREST.cs" Line="570" Column="4" />
+      <File FileName="Assets/TrailPreferences.cs" Line="11" Column="18" />
+      <File FileName="Assets/BgPreferences.cs" Line="52" Column="43" />
       <File FileName="Assets/PhysicsPreferences.cs" Line="102" Column="6" />
+      <File FileName="Assets/Sessions/20160203/AldoBo/TRAILS_1138/main.xml" Line="19" Column="48" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

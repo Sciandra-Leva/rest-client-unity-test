@@ -17,7 +17,7 @@ using System.IO;
 using System.Text;
 using SimpleJSON;
 using System.Xml;
-
+using UnityEngine.UI;
 
 public enum RestError
 {
@@ -218,7 +218,7 @@ public class NetworkREST  : MonoBehaviour {
 						name = R_users ["users"][i]["complete_name"],
 						age = local_age,
 						type = Person.Type.Doctor,
-						photo = baseURL + R_users ["users"][i]["avatar"]
+						photo = baseURL + R_users ["users"][i]["user_avatar"]
 					}
 				);
 			}
@@ -296,7 +296,7 @@ public class NetworkREST  : MonoBehaviour {
 					name = R_patients ["patients"] [i] ["complete_name"],
 					age = local_age,
 					type = Person.Type.Patient,
-					photo = baseURL + R_patients ["patients"] [i] ["avatar"]
+					photo = baseURL + R_patients ["patients"] [i] ["patient_avatar"]
 				}
 				);
 			}
@@ -487,7 +487,7 @@ public class NetworkREST  : MonoBehaviour {
 	// apparently for now I do one for each
 	public IEnumerator POSTTrailsExercise (string exercisePath) {
 
-//		bool allProper = true;
+		bool allProper = true;
 		TrailPreferences xmldata = new TrailPreferences ();
 		// let's start with the easy part: they tell me
 		// where the .xml is, I open it and read it
@@ -556,17 +556,42 @@ public class NetworkREST  : MonoBehaviour {
 			N["trails"]["patient_right_trail_color"]["b"] = TrailPreferences.patientDX_trailsColor.b.ToString();
 		}
 
+		// to do the first tests i will pass this anyway
+		N ["trails"] ["background_color"] ["a"] = TrailPreferences.backgroundColor.a.ToString ();
+		N ["trails"] ["background_color"] ["r"] = TrailPreferences.backgroundColor.r.ToString ();
+		N ["trails"] ["background_color"] ["g"] = TrailPreferences.backgroundColor.g.ToString ();
+		N ["trails"] ["background_color"] ["b"] = TrailPreferences.backgroundColor.b.ToString ();
+
 		// now the part which is going to be a mess, about the backgrounds
-		if (TrailPreferences.backgroundIsImage == false) {
-			N ["trails"] ["background_color"] ["a"] = TrailPreferences.backgroundColor.a.ToString ();
-			N ["trails"] ["background_color"] ["r"] = TrailPreferences.backgroundColor.r.ToString ();
-			N ["trails"] ["background_color"] ["g"] = TrailPreferences.backgroundColor.g.ToString ();
-			N ["trails"] ["background_color"] ["b"] = TrailPreferences.backgroundColor.b.ToString ();
-		} 
-		else 
-		{
-			// I HAVE TO FIND A WAY TO UPLOAD IMAGES FFS
-		}
+//		if (TrailPreferences.backgroundIsImage == false) {
+//			N ["trails"] ["background_color"] ["a"] = TrailPreferences.backgroundColor.a.ToString ();
+//			N ["trails"] ["background_color"] ["r"] = TrailPreferences.backgroundColor.r.ToString ();
+//			N ["trails"] ["background_color"] ["g"] = TrailPreferences.backgroundColor.g.ToString ();
+//			N ["trails"] ["background_color"] ["b"] = TrailPreferences.backgroundColor.b.ToString ();
+//		} 
+//		else 
+//		{
+			// I HAVE TO FIND A WAY TO UPLOAD IMAGES FFS backgroundTexturePath
+			// send it as base64 in JSON FUCK ME
+
+//			string test = @"C:/image/1.gif";
+//			byte[] bytes = System.Text.ASCIIEncoding.ASCII.GetBytes(test);
+//			string base64String = System.Convert.ToBase64String(bytes);
+//			Console.WriteLine("Base 64 string: " + base64String);
+
+//			using (Image image = Image.FromFile(TrailPreferences.backgroundTexturePath))
+//			{                 
+//				using (MemoryStream m = new MemoryStream())
+//				{
+//					image.Save(m, image.RawFormat);
+//					byte[] imageBytes = m.ToArray();
+//
+//					// Convert byte[] to Base64 String
+//					string base64String = Convert.ToBase64String(imageBytes);
+//					return base64String;
+//				}                  
+//			}
+//		}
 
 		if (TrailPreferences.colorFilterEnabled == true) {
 			N ["trails"] ["color_filter"] ["a"] = TrailPreferences.colorFilterAlpha.ToString ();
@@ -574,51 +599,49 @@ public class NetworkREST  : MonoBehaviour {
 			N ["trails"] ["color_filter"] ["g"] = TrailPreferences.colorFilter.g.ToString ();
 			N ["trails"] ["color_filter"] ["b"] = TrailPreferences.colorFilter.b.ToString ();
 		} 
-
-
 		// and convert it to string
 		string json_parameters = N.ToString();
 		Debug.Log ("This is what i wrote til aaaaaaand now: " + json_parameters);
 		string result = "";
 
 		// the actual call, in a try catch
-//		try 
-//		{
-//			using (var client = new WebClient())
-//			{
-//				string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
-//				client.Headers[HttpRequestHeader.Authorization] = token_string;
-//				client.Headers[HttpRequestHeader.ContentType] = "application/json";
-//				result = client.UploadString(trails_url, "POST", json_parameters);
-//			}
-//		}
-//		catch (WebException ex)
-//		{
-//			Debug.Log("exception: " + ex);
-//			var response = ex.Response as HttpWebResponse;
-//			if (response != null)
-//			{
-//				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-//			}
-//
-//			switch ((int)response.StatusCode) {
-//
-////			case 400:
-////				errorHandler = RestError.WrongMail;
-////				break;
-////			case 401:
-////				errorHandler = RestError.WrongPassword;
-////				break;
-////			case 500:
-////				errorHandler = RestError.ServerError;
-////				break;
-//			default:
-//				Debug.Log ("OH SHIT");
+		try 
+		{
+			using (var client = new WebClient())
+			{
+				string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+				client.Headers[HttpRequestHeader.Authorization] = token_string;
+				client.Headers[HttpRequestHeader.ContentType] = "application/json";
+				result = client.UploadString(trails_url, "POST", json_parameters);
+			}
+		}
+		catch (WebException ex)
+		{
+			Debug.Log("exception: " + ex);
+			var response = ex.Response as HttpWebResponse;
+			if (response != null)
+			{
+				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+			}
+
+			switch ((int)response.StatusCode) {
+
+//			case 400:
+//				errorHandler = RestError.WrongMail;
 //				break;
-//			}
-//			allProper = false;
-//		}
-//
+//			case 401:
+//				errorHandler = RestError.WrongPassword;
+//				break;
+//			case 500:
+//				errorHandler = RestError.ServerError;
+//				break;
+			default:
+				Debug.Log ("OH SHIT");
+				break;
+			}
+			allProper = false;
+		}
+
 		yield return result;
 //
 //		if (allProper) 
