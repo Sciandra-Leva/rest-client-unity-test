@@ -514,9 +514,9 @@ public class NetworkREST  : MonoBehaviour {
 		N ["trails"] ["typology"] = TrailPreferences.trailsType;
 		N ["trails"] ["start_datetime"] = TrailPreferences.initTime;
 		N ["trails"] ["end_datetime"] = TrailPreferences.endTime;
-		N ["trails"] ["special_fx"] = TrailPreferences.trailsSpecialFX.ToString();
+		N ["trails"] ["special_fx"] = TrailPreferences.trailsSpecialFX.ToString().ToLower();
 
-		N ["trails"] ["enabled_therapist_left"] = TrailPreferences.othersSX_trailsEnabled.ToString();
+		N ["trails"] ["enabled_therapist_left"] = TrailPreferences.othersSX_trailsEnabled.ToString().ToLower();
 		if (TrailPreferences.othersSX_trailsEnabled == true) 
 		{
 			N["trails"]["therapist_left_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
@@ -526,7 +526,7 @@ public class NetworkREST  : MonoBehaviour {
 			N["trails"]["therapist_left_trail_color"]["b"] = TrailPreferences.othersSX_trailsColor.b.ToString();
 		}
 
-		N ["trails"] ["enabled_therapist_right"] = TrailPreferences.othersDX_trailsEnabled.ToString();
+		N ["trails"] ["enabled_therapist_right"] = TrailPreferences.othersDX_trailsEnabled.ToString().ToLower();
 		if (TrailPreferences.othersDX_trailsEnabled == true) 
 		{
 			N["trails"]["therapist_right_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
@@ -536,7 +536,7 @@ public class NetworkREST  : MonoBehaviour {
 			N["trails"]["therapist_right_trail_color"]["b"] = TrailPreferences.othersDX_trailsColor.b.ToString();
 		}
 
-		N ["trails"] ["enabled_patient_left"] = TrailPreferences.patientSX_trailsEnabled.ToString();
+		N ["trails"] ["enabled_patient_left"] = TrailPreferences.patientSX_trailsEnabled.ToString().ToLower();
 		if (TrailPreferences.patientSX_trailsEnabled == true) 
 		{
 			N["trails"]["patient_left_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
@@ -546,7 +546,7 @@ public class NetworkREST  : MonoBehaviour {
 			N["trails"]["patient_left_trail_color"]["b"] = TrailPreferences.patientSX_trailsColor.b.ToString();
 		}
 
-		N ["trails"] ["enabled_patient_right"] = TrailPreferences.patientDX_trailsEnabled.ToString();
+		N ["trails"] ["enabled_patient_right"] = TrailPreferences.patientDX_trailsEnabled.ToString().ToLower();
 		if (TrailPreferences.patientDX_trailsEnabled == true) 
 		{
 			N["trails"]["patient_right_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
