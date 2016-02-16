@@ -494,66 +494,61 @@ public class NetworkREST  : MonoBehaviour {
 		string mainFilePath = exercisePath + "/main.xml";
 		Debug.Log ("The path i search for the xml is " + mainFilePath);
 
-		if (System.IO.File.Exists (mainFilePath)) 
-		{
+		if (System.IO.File.Exists (mainFilePath)) {
 			xmldata.LoadXML (mainFilePath);
 			Debug.Log ("I actually read it!");
 		}
 		// since it's really working we can
 		// create the JSON structure to send
-		JSONNode N = new JSONClass();
+		JSONNode N = new JSONClass ();
 
 		N ["trails"] ["patient_id"] = TrailPreferences.patientID;
-		N ["trails"] ["time_to_live"] = TrailPreferences.trailsTimeToLive.ToString();
+		N ["trails"] ["time_to_live"] = TrailPreferences.trailsTimeToLive.ToString ();
 
 		// I have to get all the doctors involved
 		// and pick out the first since it is the logged one
-		string list_of_doctors =  String.Join(", ", TrailPreferences.doctorsIDs.Skip(1).ToArray());
-		N["trails"]["other_doctors"] = "[" + list_of_doctors + "]";
+		string list_of_doctors = String.Join (", ", TrailPreferences.doctorsIDs.Skip (1).ToArray ());
+		N ["trails"] ["other_doctors"] = "[" + list_of_doctors + "]";
 
 		N ["trails"] ["typology"] = TrailPreferences.trailsType;
 		N ["trails"] ["start_datetime"] = TrailPreferences.initTime;
 		N ["trails"] ["end_datetime"] = TrailPreferences.endTime;
-		N ["trails"] ["special_fx"] = TrailPreferences.trailsSpecialFX.ToString().ToLower();
+		N ["trails"] ["special_fx"] = TrailPreferences.trailsSpecialFX.ToString ().ToLower ();
 
-		N ["trails"] ["enabled_therapist_left"] = TrailPreferences.othersSX_trailsEnabled.ToString().ToLower();
-		if (TrailPreferences.othersSX_trailsEnabled == true) 
-		{
-			N["trails"]["therapist_left_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
-			N["trails"]["therapist_left_trail_color"]["a"] = TrailPreferences.othersSX_trailsColor.a.ToString();
-			N["trails"]["therapist_left_trail_color"]["r"] = TrailPreferences.othersSX_trailsColor.r.ToString();
-			N["trails"]["therapist_left_trail_color"]["g"] = TrailPreferences.othersSX_trailsColor.g.ToString();
-			N["trails"]["therapist_left_trail_color"]["b"] = TrailPreferences.othersSX_trailsColor.b.ToString();
+		N ["trails"] ["enabled_therapist_left"] = TrailPreferences.othersSX_trailsEnabled.ToString ().ToLower ();
+		if (TrailPreferences.othersSX_trailsEnabled == true) {
+			N ["trails"] ["therapist_left_trail_color"] ["d"] = TrailPreferences.trailsDimension.ToString ();
+			N ["trails"] ["therapist_left_trail_color"] ["a"] = TrailPreferences.othersSX_trailsColor.a.ToString ();
+			N ["trails"] ["therapist_left_trail_color"] ["r"] = TrailPreferences.othersSX_trailsColor.r.ToString ();
+			N ["trails"] ["therapist_left_trail_color"] ["g"] = TrailPreferences.othersSX_trailsColor.g.ToString ();
+			N ["trails"] ["therapist_left_trail_color"] ["b"] = TrailPreferences.othersSX_trailsColor.b.ToString ();
 		}
 
-		N ["trails"] ["enabled_therapist_right"] = TrailPreferences.othersDX_trailsEnabled.ToString().ToLower();
-		if (TrailPreferences.othersDX_trailsEnabled == true) 
-		{
-			N["trails"]["therapist_right_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
-			N["trails"]["therapist_right_trail_color"]["a"] = TrailPreferences.othersDX_trailsColor.a.ToString();
-			N["trails"]["therapist_right_trail_color"]["r"] = TrailPreferences.othersDX_trailsColor.r.ToString();
-			N["trails"]["therapist_right_trail_color"]["g"] = TrailPreferences.othersDX_trailsColor.g.ToString();
-			N["trails"]["therapist_right_trail_color"]["b"] = TrailPreferences.othersDX_trailsColor.b.ToString();
+		N ["trails"] ["enabled_therapist_right"] = TrailPreferences.othersDX_trailsEnabled.ToString ().ToLower ();
+		if (TrailPreferences.othersDX_trailsEnabled == true) {
+			N ["trails"] ["therapist_right_trail_color"] ["d"] = TrailPreferences.trailsDimension.ToString ();
+			N ["trails"] ["therapist_right_trail_color"] ["a"] = TrailPreferences.othersDX_trailsColor.a.ToString ();
+			N ["trails"] ["therapist_right_trail_color"] ["r"] = TrailPreferences.othersDX_trailsColor.r.ToString ();
+			N ["trails"] ["therapist_right_trail_color"] ["g"] = TrailPreferences.othersDX_trailsColor.g.ToString ();
+			N ["trails"] ["therapist_right_trail_color"] ["b"] = TrailPreferences.othersDX_trailsColor.b.ToString ();
 		}
 
-		N ["trails"] ["enabled_patient_left"] = TrailPreferences.patientSX_trailsEnabled.ToString().ToLower();
-		if (TrailPreferences.patientSX_trailsEnabled == true) 
-		{
-			N["trails"]["patient_left_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
-			N["trails"]["patient_left_trail_color"]["a"] = TrailPreferences.patientSX_trailsColor.a.ToString();
-			N["trails"]["patient_left_trail_color"]["r"] = TrailPreferences.patientSX_trailsColor.r.ToString();
-			N["trails"]["patient_left_trail_color"]["g"] = TrailPreferences.patientSX_trailsColor.g.ToString();
-			N["trails"]["patient_left_trail_color"]["b"] = TrailPreferences.patientSX_trailsColor.b.ToString();
+		N ["trails"] ["enabled_patient_left"] = TrailPreferences.patientSX_trailsEnabled.ToString ().ToLower ();
+		if (TrailPreferences.patientSX_trailsEnabled == true) {
+			N ["trails"] ["patient_left_trail_color"] ["d"] = TrailPreferences.trailsDimension.ToString ();
+			N ["trails"] ["patient_left_trail_color"] ["a"] = TrailPreferences.patientSX_trailsColor.a.ToString ();
+			N ["trails"] ["patient_left_trail_color"] ["r"] = TrailPreferences.patientSX_trailsColor.r.ToString ();
+			N ["trails"] ["patient_left_trail_color"] ["g"] = TrailPreferences.patientSX_trailsColor.g.ToString ();
+			N ["trails"] ["patient_left_trail_color"] ["b"] = TrailPreferences.patientSX_trailsColor.b.ToString ();
 		}
 
-		N ["trails"] ["enabled_patient_right"] = TrailPreferences.patientDX_trailsEnabled.ToString().ToLower();
-		if (TrailPreferences.patientDX_trailsEnabled == true) 
-		{
-			N["trails"]["patient_right_trail_color"]["d"] = TrailPreferences.trailsDimension.ToString();
-			N["trails"]["patient_right_trail_color"]["a"] = TrailPreferences.patientDX_trailsColor.a.ToString();
-			N["trails"]["patient_right_trail_color"]["r"] = TrailPreferences.patientDX_trailsColor.r.ToString();
-			N["trails"]["patient_right_trail_color"]["g"] = TrailPreferences.patientDX_trailsColor.g.ToString();
-			N["trails"]["patient_right_trail_color"]["b"] = TrailPreferences.patientDX_trailsColor.b.ToString();
+		N ["trails"] ["enabled_patient_right"] = TrailPreferences.patientDX_trailsEnabled.ToString ().ToLower ();
+		if (TrailPreferences.patientDX_trailsEnabled == true) {
+			N ["trails"] ["patient_right_trail_color"] ["d"] = TrailPreferences.trailsDimension.ToString ();
+			N ["trails"] ["patient_right_trail_color"] ["a"] = TrailPreferences.patientDX_trailsColor.a.ToString ();
+			N ["trails"] ["patient_right_trail_color"] ["r"] = TrailPreferences.patientDX_trailsColor.r.ToString ();
+			N ["trails"] ["patient_right_trail_color"] ["g"] = TrailPreferences.patientDX_trailsColor.g.ToString ();
+			N ["trails"] ["patient_right_trail_color"] ["b"] = TrailPreferences.patientDX_trailsColor.b.ToString ();
 		}
 
 		// to do the first tests i will pass this anyway
@@ -563,22 +558,31 @@ public class NetworkREST  : MonoBehaviour {
 		N ["trails"] ["background_color"] ["b"] = TrailPreferences.backgroundColor.b.ToString ();
 
 		// now the part which is going to be a mess, about the backgrounds
-//		if (TrailPreferences.backgroundIsImage == false) {
-//			N ["trails"] ["background_color"] ["a"] = TrailPreferences.backgroundColor.a.ToString ();
-//			N ["trails"] ["background_color"] ["r"] = TrailPreferences.backgroundColor.r.ToString ();
-//			N ["trails"] ["background_color"] ["g"] = TrailPreferences.backgroundColor.g.ToString ();
-//			N ["trails"] ["background_color"] ["b"] = TrailPreferences.backgroundColor.b.ToString ();
-//		} 
-//		else 
-//		{
+		if (TrailPreferences.backgroundIsImage == false) {
+			N ["trails"] ["background_color"] ["a"] = TrailPreferences.backgroundColor.a.ToString ();
+			N ["trails"] ["background_color"] ["r"] = TrailPreferences.backgroundColor.r.ToString ();
+			N ["trails"] ["background_color"] ["g"] = TrailPreferences.backgroundColor.g.ToString ();
+			N ["trails"] ["background_color"] ["b"] = TrailPreferences.backgroundColor.b.ToString ();
+		} else {
 			// I HAVE TO FIND A WAY TO UPLOAD IMAGES FFS backgroundTexturePath
 			// send it as base64 in JSON FUCK ME
 
-//			string test = @"C:/image/1.gif";
-//			byte[] bytes = System.Text.ASCIIEncoding.ASCII.GetBytes(test);
-//			string base64String = System.Convert.ToBase64String(bytes);
-//			Console.WriteLine("Base 64 string: " + base64String);
 
+			string fullPath = Path.Combine(exercisePath, TrailPreferences.backgroundTexturePath);
+//			string test = @TrailPreferences.backgroundTexturePath;
+			//string image = "/Users/lorenzosciandra/Documents/workspace-testing-lorenzo/unity-projects/rest-client-testing/REST-client/Assets/Sessions/20160203/AldoBo/TRAILS_1138/northern-lights-christmas-background-1366-768-618491.jpeg";
+			//byte[] bytes = System.Text.ASCIIEncoding.ASCII.GetBytes(image);
+			byte[] bytes = File.ReadAllBytes(fullPath);
+
+			string base64String = System.Convert.ToBase64String(bytes);
+			Debug.Log("codifica dell'immagine: " + base64String);
+
+//			string base64String = "no";
+			//Console.WriteLine("Base 64 string: " + base64String);
+			N ["trails"] ["background_image"] ["filepath"] = fullPath;
+			N ["trails"] ["background_image"] ["filename"] = TrailPreferences.backgroundTexturePath;
+//			N ["trails"] ["background_image"] ["content"] = base64String; // bitstream here
+			N ["trails"] ["background_image"] ["content_type"] = "image/jpeg";
 //			using (Image image = Image.FromFile(TrailPreferences.backgroundTexturePath))
 //			{                 
 //				using (MemoryStream m = new MemoryStream())
@@ -590,8 +594,8 @@ public class NetworkREST  : MonoBehaviour {
 //					string base64String = Convert.ToBase64String(imageBytes);
 //					return base64String;
 //				}                  
-//			}
-//		}
+		//}
+		}
 
 		if (TrailPreferences.colorFilterEnabled == true) {
 			N ["trails"] ["color_filter"] ["a"] = TrailPreferences.colorFilterAlpha.ToString ();
@@ -605,45 +609,45 @@ public class NetworkREST  : MonoBehaviour {
 		string result = "";
 
 		// the actual call, in a try catch
-		try 
-		{
-			using (var client = new WebClient())
-			{
-				string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
-				client.Headers[HttpRequestHeader.Authorization] = token_string;
-				client.Headers[HttpRequestHeader.ContentType] = "application/json";
-				result = client.UploadString(trails_url, "POST", json_parameters);
-			}
-		}
-		catch (WebException ex)
-		{
-			Debug.Log("exception: " + ex);
-			var response = ex.Response as HttpWebResponse;
-			if (response != null)
-			{
-				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-			}
-
-			switch ((int)response.StatusCode) {
-
-//			case 400:
-//				errorHandler = RestError.WrongMail;
-//				break;
-//			case 401:
-//				errorHandler = RestError.WrongPassword;
-//				break;
-//			case 500:
-//				errorHandler = RestError.ServerError;
-//				break;
-			default:
-				Debug.Log ("OH SHIT");
-				break;
-			}
-			allProper = false;
-		}
-
-		yield return result;
+//		try 
+//		{
+//			using (var client = new WebClient())
+//			{
+//				string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+//				client.Headers[HttpRequestHeader.Authorization] = token_string;
+//				client.Headers[HttpRequestHeader.ContentType] = "application/json";
+//				result = client.UploadString(trails_url, "POST", json_parameters);
+//			}
+//		}
+//		catch (WebException ex)
+//		{
+//			Debug.Log("exception: " + ex);
+//			var response = ex.Response as HttpWebResponse;
+//			if (response != null)
+//			{
+//				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+//			}
 //
+//			switch ((int)response.StatusCode) {
+//
+////			case 400:
+////				errorHandler = RestError.WrongMail;
+////				break;
+////			case 401:
+////				errorHandler = RestError.WrongPassword;
+////				break;
+////			case 500:
+////				errorHandler = RestError.ServerError;
+////				break;
+//			default:
+//				Debug.Log ("OH SHIT");
+//				break;
+//			}
+//			allProper = false;
+//		}
+//
+		yield return result;
+////
 //		if (allProper) 
 //		{
 //			Debug.Log(result);
