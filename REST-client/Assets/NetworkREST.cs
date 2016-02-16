@@ -577,12 +577,22 @@ public class NetworkREST  : MonoBehaviour {
 			string base64String = System.Convert.ToBase64String(bytes);
 			Debug.Log("codifica dell'immagine: " + base64String);
 
+//			string test64json = N.SaveToCompressedBase64 ();
+
 //			string base64String = "no";
 			//Console.WriteLine("Base 64 string: " + base64String);
 			N ["trails"] ["background_image"] ["filepath"] = fullPath;
 			N ["trails"] ["background_image"] ["filename"] = TrailPreferences.backgroundTexturePath;
-//			N ["trails"] ["background_image"] ["content"] = base64String; // bitstream here
+			N ["trails"] ["background_image"] ["content"] = " "; // bitstream here
+//			JSONNode K = new JSONClass();
+//			K["content"] = base64String;
+			Debug.Log("1");
+//			Debug.Log("K value = " + K.ToString());
+
+			N ["trails"] ["background_image"] ["content"] = base64String;
+			Debug.Log("2");
 			N ["trails"] ["background_image"] ["content_type"] = "image/jpeg";
+			Debug.Log("3");
 //			using (Image image = Image.FromFile(TrailPreferences.backgroundTexturePath))
 //			{                 
 //				using (MemoryStream m = new MemoryStream())
@@ -604,8 +614,8 @@ public class NetworkREST  : MonoBehaviour {
 			N ["trails"] ["color_filter"] ["b"] = TrailPreferences.colorFilter.b.ToString ();
 		} 
 		// and convert it to string
-		string json_parameters = N.ToString();
-		Debug.Log ("This is what i wrote til aaaaaaand now: " + json_parameters);
+//		string json_parameters = N.ToString();
+//		Debug.Log ("This is what i wrote til aaaaaaand now: " + json_parameters);
 		string result = "";
 
 		// the actual call, in a try catch

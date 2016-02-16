@@ -44,7 +44,9 @@ public class TestNetworkScript : MonoBehaviour {
 			// list can be used
 			List<Person> listOfDoctors = new List<Person> (); 
 			yield return StartCoroutine(client.GETUsersList(listOfDoctors));
-		
+
+			Debug.Log ("Patient created");
+
 			if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
 			{
 				Debug.Log ("There has been an error: " + client.errorHandler);

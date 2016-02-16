@@ -641,6 +641,7 @@ namespace SimpleJSON
         public override string ToString()
         {
             string result = "[ ";
+
             foreach (JSONNode N in m_List)
             {
                 if (result.Length > 2)

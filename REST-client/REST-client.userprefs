@@ -2,16 +2,20 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/NetworkREST.cs">
     <Files>
-      <File FileName="Assets/NetworkREST.cs" Line="575" Column="47" />
-      <File FileName="Assets/TestNetworkScript.cs" Line="1" Column="1" />
+      <File FileName="Assets/NetworkREST.cs" Line="503" Column="33" />
+      <File FileName="Assets/TestNetworkScript.cs" Line="79" Column="63" />
       <File FileName="Assets/TrailPreferences.cs" Line="1" Column="1" />
       <File FileName="Assets/BgPreferences.cs" Line="51" Column="48" />
       <File FileName="Assets/PhysicsPreferences.cs" Line="1" Column="1" />
-      <File FileName="Assets/Sessions/20160203/AldoBo/TRAILS_1138/main.xml" Line="31" Column="21" />
+      <File FileName="Assets/Sessions/20160203/AldoBo/TRAILS_1138/main.xml" Line="1" Column="1" />
+      <File FileName="Assets/SimpleJSON.cs" Line="648" Column="21" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/lorenzosciandra/Documents/workspace-testing-lorenzo/unity-projects/rest-client-testing/REST-client/Assets/SimpleJSON.cs" line="611" column="40" />
+      <Breakpoint file="/Users/lorenzosciandra/Documents/workspace-testing-lorenzo/unity-projects/rest-client-testing/REST-client/Assets/SimpleJSON.cs" line="727" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
