@@ -45,9 +45,12 @@ public class NetworkREST  : MonoBehaviour {
 	//---------------------------------------------------------------------
 
 //	static string baseURL = "http://dev.painteraction.org";
-	static string baseURL = "http://localhost:3000";
-//	static string post_url = baseURL + "/api/v1/users";
-	static string login_url = baseURL + "/api/v1/sessions";
+//	static string baseURL = "http://localhost:3000";
+    static string baseURL = "http://painteraction:3000/";
+
+
+    //	static string post_url = baseURL + "/api/v1/users";
+    static string login_url = baseURL + "/api/v1/sessions";
 	static string force_logout_url = baseURL + "/api/v1/force_logout";
 	static string trails_url = baseURL + "/api/v1/trails";
 //	static string balls_url = baseURL + "/api/v1/balls";
