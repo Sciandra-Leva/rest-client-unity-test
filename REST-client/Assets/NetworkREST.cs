@@ -314,12 +314,12 @@ public class NetworkREST : MonoBehaviour
 
                 myHttpWebRequest.Method = "DELETE";
                 myHttpWebRequest.Headers.Add("Authorization", token_string);
-                // Sends the HttpWebRequest and waits for the response.			
+                // Sends the HttpWebRequest and waits for the response.
                 myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
                 // Gets the stream associated with the response.
                 Stream receiveStream = myHttpWebResponse.GetResponseStream();
                 Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-                // Pipes the stream to a higher level stream reader with the required encoding format. 
+                // Pipes the stream to a higher level stream reader with the required encoding format.
                 StreamReader readStream = new StreamReader(receiveStream, encode);
                 answer_text = readStream.ReadToEnd();
 
@@ -380,12 +380,12 @@ public class NetworkREST : MonoBehaviour
 
                 myHttpWebRequest.Method = "DELETE";
                 myHttpWebRequest.Headers.Add("Authorization", token_string);
-                // Sends the HttpWebRequest and waits for the response.			
+                // Sends the HttpWebRequest and waits for the response.
                 myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
                 // Gets the stream associated with the response.
                 Stream receiveStream = myHttpWebResponse.GetResponseStream();
                 Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-                // Pipes the stream to a higher level stream reader with the required encoding format. 
+                // Pipes the stream to a higher level stream reader with the required encoding format.
                 StreamReader readStream = new StreamReader(receiveStream, encode);
                 answer_text = readStream.ReadToEnd();
 
@@ -449,12 +449,12 @@ public class NetworkREST : MonoBehaviour
 
                 myHttpWebRequest.Method = "DELETE";
                 myHttpWebRequest.Headers.Add("Authorization", token_string);
-                // Sends the HttpWebRequest and waits for the response.			
+                // Sends the HttpWebRequest and waits for the response.
                 myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
                 // Gets the stream associated with the response.
                 Stream receiveStream = myHttpWebResponse.GetResponseStream();
                 Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-                // Pipes the stream to a higher level stream reader with the required encoding format. 
+                // Pipes the stream to a higher level stream reader with the required encoding format.
                 StreamReader readStream = new StreamReader(receiveStream, encode);
                 answer_text = readStream.ReadToEnd();
 
@@ -745,7 +745,7 @@ public class NetworkREST : MonoBehaviour
             }
 
             // I have to set it here because srly that is fucked up
-            PaintPreferences.backgroundIsImage = false;
+            // PaintPreferences.backgroundIsImage = false;
             // now the part which is going to be a mess, about the backgrounds
             if (PaintPreferences.backgroundIsImage == false)
             {
