@@ -63,21 +63,24 @@ public class TestNetworkScript : MonoBehaviour {
                 listOfDoctors.ElementAt(0).name
             );
 
-            //         // this is the one used to log out the 
-            //         // current user.
-            //         //			yield return StartCoroutine(client.LOGOUTUser());	
-            //         //			if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
-            //         //			{
-            //         //				Debug.Log ("There has been an error: " + client.errorHandler);
-            //         //			} 
+            // this is the one used to log out the 
+            // current user.
+            //			yield return StartCoroutine(client.LOGOUTUser());	
+            //			if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
+            //			{
+            //				Debug.Log ("There has been an error: " + client.errorHandler);
+            //			} 
 
-            //         // Ok, let's try now to get the post exercise to work.
-            //         //string path_of_exercise = "/users/lorenzosciandra/documents/workspace-testing-lorenzo" +
-            //         //	"/unity-projects/rest-client-testing/rest-client/assets/sessions/20160203/aldobo/" +
-            //         //	"trails_1138";
-            //         string path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\rest-client-unity-test\\REST-client\\Assets\\Sessions\\20160203\\AldoBo\\TRAILS_1138";
-            //         yield return StartCoroutine(client.POSTTrailsExercise(path_of_exercise));
-
+            // Ok, let's try now to get the post exercise to work.
+            //string path_of_exercise = "/users/lorenzosciandra/documents/workspace-testing-lorenzo" +
+            //	"/unity-projects/rest-client-testing/rest-client/assets/sessions/20160203/aldobo/" +
+            //	"trails_1138";
+            string path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\rest-client-unity-test\\REST-client\\Assets\\Sessions\\20160203\\AldoBo\\TRAILS_1138";
+            yield return StartCoroutine(client.POSTTrailExercise(path_of_exercise));
+            if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
+            {
+                Debug.Log("There has been an error: " + client.errorHandler);
+            }
         }
 	}
 

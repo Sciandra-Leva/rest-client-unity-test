@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+  <Session>
+    <InitTime>2/17/2016 5:07:19 PM</InitTime>
+    <EndTime>2/17/2016 5:07:55 PM</EndTime>
+    <PatientID>P0345</PatientID>
+    <PatientName>AmilcareCiao</PatientName>
+    <DoctorsIDs>
+      <DocID>agagagagaggaga</DocID>
+      <DocID>D02</DocID>
+    </DoctorsIDs>
+  </Session>
+  <background>
+    <bgLayer>
+      <image>
+      </image>
+      <!-- string: file path + name -->
+      <color>#85FFF1</color>
+      <!-- #ffffff or #fff or ffffff or fff -->
+    </bgLayer>
+    <rgbaLayer>
+      <enabled>true</enabled>
+      <!-- bool -->
+      <alpha>0.7508291</alpha>
+      <!-- float -->
+    </rgbaLayer>
+    <filterLayer>
+      <color>#868AFF</color>
+      <!-- #ffffff or #fff or ffffff or fff -->
+      <alpha>0</alpha>
+      <!-- float -->
+    </filterLayer>
+  </background>
+  <paint>
+    <numColors>8</numColors>
+    <colors>
+      <c01>#2D9600</c01>
+      <c02>#CFAB00</c02>
+      <c03>#0D00CE</c03>
+      <c04>#A72EFF</c04>
+      <c05>#FF5B30</c05>
+      <c06>#14FF10</c06>
+      <c07>#0D00CE</c07>
+      <c08>#FF16E2</c08>
+    </colors>
+    <dimensions>
+      <d01>7.37</d01>
+      <d02>20.40</d02>
+      <d03>28.47</d03>
+    </dimensions>
+    <patientOnly>False</patientOnly>
+  </paint>
+</xml>

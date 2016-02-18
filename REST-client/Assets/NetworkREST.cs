@@ -26,7 +26,8 @@ public enum RestError
 	ZeroDoctors,
 	ZeroPatients,
 	UnAuthorized,
-    NotLoggedIn
+    NotLoggedIn,
+    XMLNotPresent
 }
 
 public enum RestSession
@@ -36,32 +37,32 @@ public enum RestSession
 }
 
 
-public class NetworkREST  : MonoBehaviour {
+public class NetworkREST : MonoBehaviour
+{
 
-	//---------------------------------------------------------------------
-	//---------------------------  VARIABLES  -----------------------------
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    //---------------------------  VARIABLES  -----------------------------
+    //---------------------------------------------------------------------
 
-//	static string baseURL = "http://dev.painteraction.org";
-//	static string baseURL = "http://localhost:3000";
+    //	static string baseURL = "http://dev.painteraction.org";
+    //	static string baseURL = "http://localhost:3000";
     static string baseURL = "http://painteraction:3000/";
 
 
     static string login_url = baseURL + "/api/v1/sessions";
-	static string force_logout_url = baseURL + "/api/v1/force_logout";
-	static string trails_url = baseURL + "/api/v1/trails";
-//	static string balls_url = baseURL + "/api/v1/balls";
-//	static string paints_url = baseURL + "/api/v1/paints";
-//	static string vowels_url = baseURL + "/api/v1/vowels";
+    static string force_logout_url = baseURL + "/api/v1/force_logout";
+    static string trails_url = baseURL + "/api/v1/trails";
+    static string paints_url = baseURL + "/api/v1/paints";
 
-    
+    //	static string balls_url = baseURL + "/api/v1/balls";
+    //	static string vowels_url = baseURL + "/api/v1/vowels";
 
-	private string token = "";
-	private string login_email = "";
-	private string login_password = "";
+    private string token = "";
+    private string login_email = "";
+    private string login_password = "";
 
-	public RestError errorHandler = RestError.AllGood;
-	public RestSession sessionsHandler = RestSession.AllGood;
+    public RestError errorHandler = RestError.AllGood;
+    public RestSession sessionsHandler = RestSession.AllGood;
 
 
 
@@ -71,25 +72,19 @@ public class NetworkREST  : MonoBehaviour {
 
     // TO DO: a check connection method, in order to not screw up later
 
-
     // Use this to do a POST and create a session
     public IEnumerator LOGINUser(string email, string password)
     {
-
         bool allProper = true;
 
         // I need to store those informations for other calls
         login_email = email;
         login_password = password;
 
-        // new library first try
         JSONObject nested_fields = new JSONObject(JSONObject.Type.OBJECT);
-        // number
         nested_fields.AddField("email", login_email);
-        // string
         nested_fields.AddField("password", login_password);
-        // array
-        JSONObject root_field = new JSONObject(JSONObject.Type.ARRAY);
+        JSONObject root_field = new JSONObject(JSONObject.Type.OBJECT);
         root_field.AddField("user", nested_fields);
 
         string encodedString = root_field.ToString();
@@ -142,12 +137,11 @@ public class NetworkREST  : MonoBehaviour {
             // this won't work everytime
             Dictionary<string, string> decoded_response = j.ToDictionary();
             token = decoded_response["token"];
-            // Debug.Log(token);
             int sessionCounter = int.Parse(decoded_response["sessions_counter"]);
 
             if (sessionCounter > 0)
             {
-            		sessionsHandler = RestSession.MultipleActive;
+                sessionsHandler = RestSession.MultipleActive;
             }
         }
     }
@@ -155,17 +149,16 @@ public class NetworkREST  : MonoBehaviour {
     // Use this to GET the list of users
     public IEnumerator GETUsersList(List<Person> listOfDoctors)
     {
-
         bool allProper = true;
 
         string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
         string result = "";
-        String answer_text = String.Empty;
+        string answer_text = string.Empty;
 
         try
         {
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(baseURL + "/api/v1/users");
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(baseURL + "/api/v1/users");
             request.Method = "GET";
             request.Headers[HttpRequestHeader.Authorization] = token_string;
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
@@ -208,7 +201,7 @@ public class NetworkREST  : MonoBehaviour {
 
             JSONObject root_users = new JSONObject(answer_text);
 
-            JSONObject nested_users = (JSONObject)root_users.list[0];
+            JSONObject nested_users = root_users.list[0];
 
             foreach (JSONObject user in nested_users.list)
             {
@@ -223,9 +216,6 @@ public class NetworkREST  : MonoBehaviour {
                     }
                 );
             }
-
-            //Debug.Log("There are " + listOfDoctors.Count() + " elements in the array");
-
         }
     }
 
@@ -238,11 +228,11 @@ public class NetworkREST  : MonoBehaviour {
         string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
         string result = "";
-        String answer_text = String.Empty;
+        string answer_text = string.Empty;
 
         try
         {
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(baseURL + "/api/v1/patients");
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(baseURL + "/api/v1/patients");
             request.Method = "GET";
             request.Headers[HttpRequestHeader.Authorization] = token_string;
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
@@ -282,23 +272,21 @@ public class NetworkREST  : MonoBehaviour {
 
         if (allProper)
         {
-            //Debug.Log("The returned list of patients is " + answer_text);
-
             JSONObject root_patients = new JSONObject(answer_text);
 
-            JSONObject nested_patients = (JSONObject)root_patients.list[0];
+            JSONObject nested_patients = root_patients.list[0];
 
             foreach (JSONObject patient in nested_patients.list)
             {
                 Dictionary<string, string> decoded_patient = patient.ToDictionary();
                 listOfPatients.Add(new Person()
-                    {
-                        ID = decoded_patient["id"],
-                        name = decoded_patient["complete_name"],
-                        age = int.Parse(decoded_patient["age"]),
-                        type = Person.Type.Patient,
-                        photo = baseURL + decoded_patient["patient_avatar"]
-                    }
+                {
+                    ID = decoded_patient["id"],
+                    name = decoded_patient["complete_name"],
+                    age = int.Parse(decoded_patient["age"]),
+                    type = Person.Type.Patient,
+                    photo = baseURL + decoded_patient["patient_avatar"]
+                }
                 );
             }
         }
@@ -317,7 +305,7 @@ public class NetworkREST  : MonoBehaviour {
 
             string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
-            String answer_text = String.Empty;
+            string answer_text = string.Empty;
 
             HttpWebResponse myHttpWebResponse = null;
             try
@@ -350,7 +338,6 @@ public class NetworkREST  : MonoBehaviour {
                 }
                 switch ((int)response.StatusCode)
                 {
-                    // I don't really have many ideas about the kind of error here
                     case 401:
                         errorHandler = RestError.UnAuthorized;
                         break;
@@ -384,7 +371,7 @@ public class NetworkREST  : MonoBehaviour {
             bool allProper = true;
             string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
-            String answer_text = String.Empty;
+            string answer_text = string.Empty;
 
             HttpWebResponse myHttpWebResponse = null;
             try
@@ -417,7 +404,6 @@ public class NetworkREST  : MonoBehaviour {
                 }
                 switch ((int)response.StatusCode)
                 {
-                    // I don't really have many ideas about the kind of error here
                     case 401:
                         errorHandler = RestError.UnAuthorized;
                         break;
@@ -444,7 +430,7 @@ public class NetworkREST  : MonoBehaviour {
     // Use this to DELETE and do a logout
     public void FinalLOGOUTUser()
     {
-        if(token.Equals(""))
+        if (token.Equals(""))
         {
             errorHandler = RestError.NotLoggedIn;
         }
@@ -454,7 +440,7 @@ public class NetworkREST  : MonoBehaviour {
 
             string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
-            String answer_text = String.Empty;
+            string answer_text = string.Empty;
 
             HttpWebResponse myHttpWebResponse = null;
             try
@@ -487,7 +473,6 @@ public class NetworkREST  : MonoBehaviour {
                 }
                 switch ((int)response.StatusCode)
                 {
-                    // I don't really have many ideas about the kind of error here
                     case 401:
                         errorHandler = RestError.UnAuthorized;
                         break;
@@ -509,192 +494,340 @@ public class NetworkREST  : MonoBehaviour {
         }
     }
 
-    //	//---------------------------------------------------------------------
-    //	//------------------------  TESTING METHODS  --------------------------
-    //	//---------------------------------------------------------------------
 
-    //	// Use this to do a POST and create a session
-    //	// apparently for now I do one for each
-    //	public IEnumerator POSTTrailsExercise (string exercisePath) {
+    // Use this to do a POST of a trails exercise
+    public IEnumerator POSTTrailExercise(string exercisePath)
+    {
+        bool allProper = true;
+        string result = "";
 
-    //		bool allProper = true;
-    //		TrailPreferences xmldata = new TrailPreferences ();
+        TrailPreferences xmldata = new TrailPreferences();
 
-    //        // let's start with the easy part: they tell me
-    //        // where the .xml is, I open it and read it
-    //        string mainFilePath = exercisePath + "/main.xml";
-    //		Debug.Log ("The path i search for the xml is " + mainFilePath);
+        // let's start with the easy part: they tell me
+        // where the .xml is, I open it and read it
+        string mainFilePath = exercisePath + "\\main.xml";
+        Debug.Log("The path i search for the xml is " + mainFilePath);
 
-    //		if (System.IO.File.Exists (mainFilePath)) {
-    //			xmldata.LoadXML (mainFilePath);
-    //			Debug.Log ("I actually read it!");
-    //		}
-    //		// since it's really working we can
-    //		// create the JSON structure to send
-    //		JSONNode N = new JSONClass ();
+        if (File.Exists(mainFilePath))
+        {
+            xmldata.LoadXML(mainFilePath);
+            Debug.Log("I actually read it!");
 
-    //		N ["trails"] ["patient_id"] = TrailPreferences.patientID;
-    //		N ["trails"] ["time_to_live"] = TrailPreferences.trailsTimeToLive.ToString ();
+            // since it's really working we can
+            // create the JSON structure to send
 
-    //		// I have to get all the doctors involved
-    //		// and pick out the first since it is the logged one
-    //		string list_of_doctors = String.Join (", ", TrailPreferences.doctorsIDs.Skip (1).ToArray ());
-    //		N ["trails"] ["other_doctors"] = "[" + list_of_doctors + "]";
+            JSONObject nested_fields_lvl1 = new JSONObject(JSONObject.Type.OBJECT);
 
-    //		N ["trails"] ["typology"] = TrailPreferences.trailsType;
-    //		N ["trails"] ["start_datetime"] = TrailPreferences.initTime;
-    //		N ["trails"] ["end_datetime"] = TrailPreferences.endTime;
-    //		N ["trails"] ["special_fx"] = TrailPreferences.trailsSpecialFX.ToString ().ToLower ();
+            nested_fields_lvl1.AddField("patient_id", TrailPreferences.patientID);
+            nested_fields_lvl1.AddField("time_to_live", TrailPreferences.trailsTimeToLive);
+            nested_fields_lvl1.AddField("typology", TrailPreferences.trailsType);
+            nested_fields_lvl1.AddField("start_datetime", TrailPreferences.initTime);
+            nested_fields_lvl1.AddField("end_datetime", TrailPreferences.endTime);
+            nested_fields_lvl1.AddField("special_fx", TrailPreferences.trailsSpecialFX.ToString().ToLower());
 
-    //		N ["trails"] ["enabled_therapist_left"] = TrailPreferences.othersSX_trailsEnabled.ToString ().ToLower ();
-    //		if (TrailPreferences.othersSX_trailsEnabled == true) {
-    //			N ["trails"] ["therapist_left_trail_color"] ["d"] = TrailPreferences.trailsDimension.ToString ();
-    //			N ["trails"] ["therapist_left_trail_color"] ["a"] = TrailPreferences.othersSX_trailsColor.a.ToString ();
-    //			N ["trails"] ["therapist_left_trail_color"] ["r"] = TrailPreferences.othersSX_trailsColor.r.ToString ();
-    //			N ["trails"] ["therapist_left_trail_color"] ["g"] = TrailPreferences.othersSX_trailsColor.g.ToString ();
-    //			N ["trails"] ["therapist_left_trail_color"] ["b"] = TrailPreferences.othersSX_trailsColor.b.ToString ();
-    //		}
+            // I have to get all the doctors involved
+            // and pick out the first since it is the logged one
+            string list_of_doctors = string.Join(", ", TrailPreferences.doctorsIDs.Skip(1).ToArray());
+            nested_fields_lvl1.AddField("other_doctors", "[" + list_of_doctors + "]");
 
-    //		N ["trails"] ["enabled_therapist_right"] = TrailPreferences.othersDX_trailsEnabled.ToString ().ToLower ();
-    //		if (TrailPreferences.othersDX_trailsEnabled == true) {
-    //			N ["trails"] ["therapist_right_trail_color"] ["d"] = TrailPreferences.trailsDimension.ToString ();
-    //			N ["trails"] ["therapist_right_trail_color"] ["a"] = TrailPreferences.othersDX_trailsColor.a.ToString ();
-    //			N ["trails"] ["therapist_right_trail_color"] ["r"] = TrailPreferences.othersDX_trailsColor.r.ToString ();
-    //			N ["trails"] ["therapist_right_trail_color"] ["g"] = TrailPreferences.othersDX_trailsColor.g.ToString ();
-    //			N ["trails"] ["therapist_right_trail_color"] ["b"] = TrailPreferences.othersDX_trailsColor.b.ToString ();
-    //		}
+            // ok, let's start with the big issues... trails colors
+            nested_fields_lvl1.AddField("enabled_therapist_left", TrailPreferences.othersSX_trailsEnabled.ToString().ToLower());
+            if (TrailPreferences.othersSX_trailsEnabled == true)
+            {
+                JSONObject nested_fields_lvl2TL = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2TL.AddField("d", TrailPreferences.trailsDimension);
+                nested_fields_lvl2TL.AddField("a", TrailPreferences.othersSX_trailsColor.a.ToString());
+                nested_fields_lvl2TL.AddField("r", TrailPreferences.othersSX_trailsColor.r.ToString());
+                nested_fields_lvl2TL.AddField("g", TrailPreferences.othersSX_trailsColor.g.ToString());
+                nested_fields_lvl2TL.AddField("b", TrailPreferences.othersSX_trailsColor.b.ToString());
 
-    //		N ["trails"] ["enabled_patient_left"] = TrailPreferences.patientSX_trailsEnabled.ToString ().ToLower ();
-    //		if (TrailPreferences.patientSX_trailsEnabled == true) {
-    //			N ["trails"] ["patient_left_trail_color"] ["d"] = TrailPreferences.trailsDimension.ToString ();
-    //			N ["trails"] ["patient_left_trail_color"] ["a"] = TrailPreferences.patientSX_trailsColor.a.ToString ();
-    //			N ["trails"] ["patient_left_trail_color"] ["r"] = TrailPreferences.patientSX_trailsColor.r.ToString ();
-    //			N ["trails"] ["patient_left_trail_color"] ["g"] = TrailPreferences.patientSX_trailsColor.g.ToString ();
-    //			N ["trails"] ["patient_left_trail_color"] ["b"] = TrailPreferences.patientSX_trailsColor.b.ToString ();
-    //		}
+                nested_fields_lvl1.AddField("therapist_left_trail_color", nested_fields_lvl2TL);
+            }
 
-    //		N ["trails"] ["enabled_patient_right"] = TrailPreferences.patientDX_trailsEnabled.ToString ().ToLower ();
-    //		if (TrailPreferences.patientDX_trailsEnabled == true) {
-    //			N ["trails"] ["patient_right_trail_color"] ["d"] = TrailPreferences.trailsDimension.ToString ();
-    //			N ["trails"] ["patient_right_trail_color"] ["a"] = TrailPreferences.patientDX_trailsColor.a.ToString ();
-    //			N ["trails"] ["patient_right_trail_color"] ["r"] = TrailPreferences.patientDX_trailsColor.r.ToString ();
-    //			N ["trails"] ["patient_right_trail_color"] ["g"] = TrailPreferences.patientDX_trailsColor.g.ToString ();
-    //			N ["trails"] ["patient_right_trail_color"] ["b"] = TrailPreferences.patientDX_trailsColor.b.ToString ();
-    //		}
+            nested_fields_lvl1.AddField("enabled_therapist_right", TrailPreferences.othersDX_trailsEnabled.ToString().ToLower());
+            if (TrailPreferences.othersDX_trailsEnabled == true)
+            {
+                JSONObject nested_fields_lvl2TR = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2TR.AddField("d", TrailPreferences.trailsDimension);
+                nested_fields_lvl2TR.AddField("a", TrailPreferences.othersDX_trailsColor.a.ToString());
+                nested_fields_lvl2TR.AddField("r", TrailPreferences.othersDX_trailsColor.r.ToString());
+                nested_fields_lvl2TR.AddField("g", TrailPreferences.othersDX_trailsColor.g.ToString());
+                nested_fields_lvl2TR.AddField("b", TrailPreferences.othersDX_trailsColor.b.ToString());
 
-    //		// to do the first tests i will pass this anyway
-    //		N ["trails"] ["background_color"] ["a"] = TrailPreferences.backgroundColor.a.ToString ();
-    //		N ["trails"] ["background_color"] ["r"] = TrailPreferences.backgroundColor.r.ToString ();
-    //		N ["trails"] ["background_color"] ["g"] = TrailPreferences.backgroundColor.g.ToString ();
-    //		N ["trails"] ["background_color"] ["b"] = TrailPreferences.backgroundColor.b.ToString ();
+                nested_fields_lvl1.AddField("therapist_right_trail_color", nested_fields_lvl2TR);
+            }
 
-    //		// now the part which is going to be a mess, about the backgrounds
-    //		if (TrailPreferences.backgroundIsImage == false) {
-    //			N ["trails"] ["background_color"] ["a"] = TrailPreferences.backgroundColor.a.ToString ();
-    //			N ["trails"] ["background_color"] ["r"] = TrailPreferences.backgroundColor.r.ToString ();
-    //			N ["trails"] ["background_color"] ["g"] = TrailPreferences.backgroundColor.g.ToString ();
-    //			N ["trails"] ["background_color"] ["b"] = TrailPreferences.backgroundColor.b.ToString ();
-    //		} else {
-    //			// I HAVE TO FIND A WAY TO UPLOAD IMAGES FFS backgroundTexturePath
-    //			// send it as base64 in JSON FUCK ME
+            nested_fields_lvl1.AddField("enabled_patient_left", TrailPreferences.patientSX_trailsEnabled.ToString().ToLower());
+            if (TrailPreferences.patientSX_trailsEnabled == true)
+            {
+                JSONObject nested_fields_lvl2PL = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2PL.AddField("d", TrailPreferences.trailsDimension);
+                nested_fields_lvl2PL.AddField("a", TrailPreferences.patientSX_trailsColor.a.ToString());
+                nested_fields_lvl2PL.AddField("r", TrailPreferences.patientSX_trailsColor.r.ToString());
+                nested_fields_lvl2PL.AddField("g", TrailPreferences.patientSX_trailsColor.g.ToString());
+                nested_fields_lvl2PL.AddField("b", TrailPreferences.patientSX_trailsColor.b.ToString());
+
+                nested_fields_lvl1.AddField("patient_left_trail_color", nested_fields_lvl2PL);
+            }
+
+            nested_fields_lvl1.AddField("enabled_patient_right", TrailPreferences.patientDX_trailsEnabled.ToString().ToLower());
+            if (TrailPreferences.patientDX_trailsEnabled == true)
+            {
+                JSONObject nested_fields_lvl2PR = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2PR.AddField("d", TrailPreferences.trailsDimension);
+                nested_fields_lvl2PR.AddField("a", TrailPreferences.patientDX_trailsColor.a.ToString());
+                nested_fields_lvl2PR.AddField("r", TrailPreferences.patientDX_trailsColor.r.ToString());
+                nested_fields_lvl2PR.AddField("g", TrailPreferences.patientDX_trailsColor.g.ToString());
+                nested_fields_lvl2PR.AddField("b", TrailPreferences.patientDX_trailsColor.b.ToString());
+
+                nested_fields_lvl1.AddField("patient_right_trail_color", nested_fields_lvl2PR);
+            }
+
+            if (TrailPreferences.colorFilterEnabled == true)
+            {
+                JSONObject nested_fields_lvl2CF = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2CF.AddField("a", TrailPreferences.colorFilterAlpha.ToString());
+                nested_fields_lvl2CF.AddField("r", TrailPreferences.colorFilter.r.ToString());
+                nested_fields_lvl2CF.AddField("g", TrailPreferences.colorFilter.g.ToString());
+                nested_fields_lvl2CF.AddField("b", TrailPreferences.colorFilter.b.ToString());
+
+                nested_fields_lvl1.AddField("color_filter", nested_fields_lvl2CF);
+            }
+
+            // now the part which is going to be a mess, about the backgrounds
+            if (TrailPreferences.backgroundIsImage == false)
+            {
+                JSONObject nested_fields_lvl2BG = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2BG.AddField("a", TrailPreferences.backgroundColor.a.ToString());
+                nested_fields_lvl2BG.AddField("r", TrailPreferences.backgroundColor.r.ToString());
+                nested_fields_lvl2BG.AddField("g", TrailPreferences.backgroundColor.g.ToString());
+                nested_fields_lvl2BG.AddField("b", TrailPreferences.backgroundColor.b.ToString());
+
+                nested_fields_lvl1.AddField("background_color", nested_fields_lvl2BG);
+            }
+            else
+            {
+                string fullPath = Path.Combine(exercisePath, TrailPreferences.backgroundTexturePath);
+
+                byte[] bytes = File.ReadAllBytes(fullPath);
+
+                string base64String = System.Convert.ToBase64String(bytes);
+                Debug.Log("codifica dell'immagine: " + base64String);
+
+                JSONObject nested_fields_lvl2BI = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2BI.AddField("filename", TrailPreferences.backgroundTexturePath);
+                nested_fields_lvl2BI.AddField("content", base64String);
+                nested_fields_lvl2BI.AddField("content_type", "image/jpeg");
+
+                nested_fields_lvl1.AddField("background_image", nested_fields_lvl2BI);
+            }
+
+            // finally, everything goes back into trail
+            JSONObject root_trail = new JSONObject(JSONObject.Type.OBJECT);
+            root_trail.AddField("trail", nested_fields_lvl1);
+
+            string encodedString = root_trail.ToString();
+
+            //the actual call, in a try catch
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+                    client.Headers[HttpRequestHeader.Authorization] = token_string;
+                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    result = client.UploadString(trails_url, "POST", encodedString);
+                }
+            }
+            catch (WebException ex)
+            {
+                Debug.Log("exception: " + ex);
+                var response = ex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                }
+
+                switch ((int)response.StatusCode)
+                {
+                    case 500:
+                        errorHandler = RestError.ServerError;
+                        break;
+                    default:
+                        Debug.Log("OH SHIT");
+                        break;
+                }
+                allProper = false;
+            }
+
+            yield return result;
+
+            if (allProper)
+            {
+                Debug.Log(result);
+                // not really much to do if the exercise has been uploaded properly
+            }
+
+        }
+        else
+        {
+            errorHandler = RestError.XMLNotPresent;
+        }
+
+        yield return result;
+
+    }
+
+    //---------------------------------------------------------------------
+    //------------------------  TESTING METHODS  --------------------------
+    //---------------------------------------------------------------------
+
+    // Use this to do a POST for a paint exercise
+    public IEnumerator POSTPaintExercise(string exercisePath)
+    {
+        bool allProper = true;
+        string result = "";
+
+        PaintPreferences xmldata = new PaintPreferences();
+
+        // let's start with the easy part: they tell me
+        // where the .xml is, I open it and read it
+        string mainFilePath = exercisePath + "\\main.xml";
+        Debug.Log("The path i search for the xml is " + mainFilePath);
+
+        if (File.Exists(mainFilePath))
+        {
+            xmldata.LoadXML(mainFilePath);
+            Debug.Log("I actually read it!");
+
+            // since it's really working we can
+            // create the JSON structure to send
+
+            JSONObject nested_fields_lvl1 = new JSONObject(JSONObject.Type.OBJECT);
 
 
-    //			string fullPath = Path.Combine(exercisePath, TrailPreferences.backgroundTexturePath);
-    ////			string test = @TrailPreferences.backgroundTexturePath;
-    //			//string image = "/Users/lorenzosciandra/Documents/workspace-testing-lorenzo/unity-projects/rest-client-testing/REST-client/Assets/Sessions/20160203/AldoBo/TRAILS_1138/northern-lights-christmas-background-1366-768-618491.jpeg";
-    //			//byte[] bytes = System.Text.ASCIIEncoding.ASCII.GetBytes(image);
-    //			byte[] bytes = File.ReadAllBytes(fullPath);
+            nested_fields_lvl1.AddField("patient_id", PaintPreferences.patientID);
+            nested_fields_lvl1.AddField("start_datetime", PaintPreferences.initTime);
+            nested_fields_lvl1.AddField("end_datetime", PaintPreferences.endTime);
 
-    //			string base64String = System.Convert.ToBase64String(bytes);
-    //			Debug.Log("codifica dell'immagine: " + base64String);
+            // I have to get all the doctors involved
+            // and pick out the first since it is the logged one
+            string list_of_doctors = string.Join(", ", PaintPreferences.doctorsIDs.Skip(1).ToArray());
+            nested_fields_lvl1.AddField("other_doctors", "[" + list_of_doctors + "]");
 
-    ////			string test64json = N.SaveToCompressedBase64 ();
+            // ok, let's start with the big issues... trails colors
+            //nested_fields_lvl1.AddField("enabled_therapist_left", PaintPreferences.othersSX_trailsEnabled.ToString().ToLower());
+            //if (PaintPreferences.othersSX_trailsEnabled == true)
+            //{
+            //    JSONObject nested_fields_lvl2TL = new JSONObject(JSONObject.Type.OBJECT);
+            //    nested_fields_lvl2TL.AddField("d", PaintPreferences.trailsDimension);
+            //    nested_fields_lvl2TL.AddField("a", PaintPreferences.othersSX_trailsColor.a.ToString());
+            //    nested_fields_lvl2TL.AddField("r", PaintPreferences.othersSX_trailsColor.r.ToString());
+            //    nested_fields_lvl2TL.AddField("g", PaintPreferences.othersSX_trailsColor.g.ToString());
+            //    nested_fields_lvl2TL.AddField("b", PaintPreferences.othersSX_trailsColor.b.ToString());
 
-    ////			string base64String = "no";
-    //			//Console.WriteLine("Base 64 string: " + base64String);
-    //			N ["trails"] ["background_image"] ["filepath"] = fullPath;
-    //			N ["trails"] ["background_image"] ["filename"] = TrailPreferences.backgroundTexturePath;
-    //			N ["trails"] ["background_image"] ["content"] = " "; // bitstream here
-    ////			JSONNode K = new JSONClass();
-    ////			K["content"] = base64String;
-    //			Debug.Log("1");
-    ////			Debug.Log("K value = " + K.ToString());
+            //    nested_fields_lvl1.AddField("therapist_left_trail_color", nested_fields_lvl2TL);
+            //}
 
-    //			N ["trails"] ["background_image"] ["content"] = base64String;
-    //			Debug.Log("2");
-    //			N ["trails"] ["background_image"] ["content_type"] = "image/jpeg";
-    //			Debug.Log("3");
-    ////			using (Image image = Image.FromFile(TrailPreferences.backgroundTexturePath))
-    ////			{                 
-    ////				using (MemoryStream m = new MemoryStream())
-    ////				{
-    ////					image.Save(m, image.RawFormat);
-    ////					byte[] imageBytes = m.ToArray();
-    ////
-    ////					// Convert byte[] to Base64 String
-    ////					string base64String = Convert.ToBase64String(imageBytes);
-    ////					return base64String;
-    ////				}                  
-    //		//}
-    //		}
+            if (PaintPreferences.colorFilterEnabled == true)
+            {
+                JSONObject nested_fields_lvl2CF = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2CF.AddField("a", PaintPreferences.colorFilterAlpha.ToString());
+                nested_fields_lvl2CF.AddField("r", PaintPreferences.colorFilter.r.ToString());
+                nested_fields_lvl2CF.AddField("g", PaintPreferences.colorFilter.g.ToString());
+                nested_fields_lvl2CF.AddField("b", PaintPreferences.colorFilter.b.ToString());
 
-    //		if (TrailPreferences.colorFilterEnabled == true) {
-    //			N ["trails"] ["color_filter"] ["a"] = TrailPreferences.colorFilterAlpha.ToString ();
-    //			N ["trails"] ["color_filter"] ["r"] = TrailPreferences.colorFilter.r.ToString ();
-    //			N ["trails"] ["color_filter"] ["g"] = TrailPreferences.colorFilter.g.ToString ();
-    //			N ["trails"] ["color_filter"] ["b"] = TrailPreferences.colorFilter.b.ToString ();
-    //		} 
-    //		// and convert it to string
-    ////		string json_parameters = N.ToString();
-    ////		Debug.Log ("This is what i wrote til aaaaaaand now: " + json_parameters);
-    //		string result = "";
+                nested_fields_lvl1.AddField("color_filter", nested_fields_lvl2CF);
+            }
 
-    //		// the actual call, in a try catch
-    ////		try 
-    ////		{
-    ////			using (var client = new WebClient())
-    ////			{
-    ////				string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
-    ////				client.Headers[HttpRequestHeader.Authorization] = token_string;
-    ////				client.Headers[HttpRequestHeader.ContentType] = "application/json";
-    ////				result = client.UploadString(trails_url, "POST", json_parameters);
-    ////			}
-    ////		}
-    ////		catch (WebException ex)
-    ////		{
-    ////			Debug.Log("exception: " + ex);
-    ////			var response = ex.Response as HttpWebResponse;
-    ////			if (response != null)
-    ////			{
-    ////				Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-    ////			}
-    ////
-    ////			switch ((int)response.StatusCode) {
-    ////
-    //////			case 400:
-    //////				errorHandler = RestError.WrongMail;
-    //////				break;
-    //////			case 401:
-    //////				errorHandler = RestError.WrongPassword;
-    //////				break;
-    //////			case 500:
-    //////				errorHandler = RestError.ServerError;
-    //////				break;
-    ////			default:
-    ////				Debug.Log ("OH SHIT");
-    ////				break;
-    ////			}
-    ////			allProper = false;
-    ////		}
-    ////
-    //		yield return result;
-    //////
-    ////		if (allProper) 
-    ////		{
-    ////			Debug.Log(result);
-    ////		}
+            // now the part which is going to be a mess, about the backgrounds
+            if (PaintPreferences.backgroundIsImage == false)
+            {
+                JSONObject nested_fields_lvl2BG = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2BG.AddField("a", PaintPreferences.backgroundColor.a.ToString());
+                nested_fields_lvl2BG.AddField("r", PaintPreferences.backgroundColor.r.ToString());
+                nested_fields_lvl2BG.AddField("g", PaintPreferences.backgroundColor.g.ToString());
+                nested_fields_lvl2BG.AddField("b", PaintPreferences.backgroundColor.b.ToString());
 
-    //	}
+                nested_fields_lvl1.AddField("background_color", nested_fields_lvl2BG);
+            }
+            else
+            {
+                string fullPath = Path.Combine(exercisePath, PaintPreferences.backgroundTexturePath);
+
+                byte[] bytes = File.ReadAllBytes(fullPath);
+
+                string base64String = Convert.ToBase64String(bytes);
+                Debug.Log("codifica dell'immagine: " + base64String);
+
+                JSONObject nested_fields_lvl2BI = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2BI.AddField("filename", PaintPreferences.backgroundTexturePath);
+                nested_fields_lvl2BI.AddField("content", base64String);
+                nested_fields_lvl2BI.AddField("content_type", "image/jpeg");
+
+                nested_fields_lvl1.AddField("background_image", nested_fields_lvl2BI);
+            }
+
+            // finally, everything goes back in to trails
+            JSONObject root_paint = new JSONObject(JSONObject.Type.OBJECT);
+            root_paint.AddField("paint", nested_fields_lvl1);
+
+            string encodedString = root_paint.ToString();
+
+            //the actual call, in a try catch
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+                    client.Headers[HttpRequestHeader.Authorization] = token_string;
+                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    result = client.UploadString(paints_url, "POST", encodedString);
+                }
+            }
+            catch (WebException ex)
+            {
+                Debug.Log("exception: " + ex);
+                var response = ex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                }
+
+                switch ((int)response.StatusCode)
+                {
+
+                    //			case 400:
+                    //				errorHandler = RestError.WrongMail;
+                    //				break;
+                    //			case 401:
+                    //				errorHandler = RestError.WrongPassword;
+                    //				break;
+                    case 500:
+                        errorHandler = RestError.ServerError;
+                        break;
+                    default:
+                        Debug.Log("OH SHIT");
+                        break;
+                }
+                allProper = false;
+            }
+
+            yield return result;
+
+            if (allProper)
+            {
+                Debug.Log(result);
+            }
+
+        }
+        else
+        {
+            errorHandler = RestError.XMLNotPresent;
+        }
+
+        yield return result;
+
+    }
 
 }
-
