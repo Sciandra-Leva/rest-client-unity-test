@@ -44,9 +44,9 @@ public class NetworkREST : MonoBehaviour
     //---------------------------  VARIABLES  -----------------------------
     //---------------------------------------------------------------------
 
-    //	static string baseURL = "http://dev.painteraction.org";
+    static string baseURL = "http://dev.painteraction.org";
     //	static string baseURL = "http://localhost:3000";
-    static string baseURL = "http://painteraction:3000/";
+    // static string baseURL = "http://painteraction:3000/";
 
 
     static string login_url = baseURL + "/api/v1/sessions";
@@ -122,7 +122,7 @@ public class NetworkREST : MonoBehaviour
                     errorHandler = RestError.ServerError;
                     break;
                 default:
-                    Debug.Log("OH SHIT");
+                    // Debug.Log("OH SHIT");
                     break;
             }
             allProper = false;
@@ -188,7 +188,7 @@ public class NetworkREST : MonoBehaviour
                     errorHandler = RestError.ServerError;
                     break;
                 default:
-                    Debug.Log("OH SHIT");
+                    // Debug.Log("OH SHIT");
                     break;
             }
             allProper = false;
@@ -262,7 +262,7 @@ public class NetworkREST : MonoBehaviour
                     errorHandler = RestError.ServerError;
                     break;
                 default:
-                    Debug.Log("OH SHIT");
+                    // Debug.Log("OH SHIT");
                     break;
             }
             allProper = false;
@@ -345,7 +345,7 @@ public class NetworkREST : MonoBehaviour
                         errorHandler = RestError.ServerError;
                         break;
                     default:
-                        Debug.Log("OH SHIT");
+                        // Debug.Log("OH SHIT");
                         break;
                 }
                 allProper = false;
@@ -354,7 +354,7 @@ public class NetworkREST : MonoBehaviour
             yield return myHttpWebResponse;
             if (allProper)
             {
-                Debug.Log(answer_text);
+                //Debug.Log(answer_text);
             }
         }
     }
@@ -411,7 +411,7 @@ public class NetworkREST : MonoBehaviour
                         errorHandler = RestError.ServerError;
                         break;
                     default:
-                        Debug.Log("OH SHIT");
+                        // Debug.Log("OH SHIT");
                         break;
                 }
                 allProper = false;
@@ -421,7 +421,7 @@ public class NetworkREST : MonoBehaviour
             yield return myHttpWebResponse;
             if (allProper)
             {
-                Debug.Log(answer_text);
+                //Debug.Log(answer_text);
                 token = "";
             }
         }
@@ -480,7 +480,7 @@ public class NetworkREST : MonoBehaviour
                         errorHandler = RestError.ServerError;
                         break;
                     default:
-                        Debug.Log("OH SHIT");
+                        // Debug.Log("OH SHIT");
                         break;
                 }
                 allProper = false;
@@ -488,7 +488,7 @@ public class NetworkREST : MonoBehaviour
 
             if (allProper)
             {
-                Debug.Log(answer_text);
+                //Debug.Log(answer_text);
                 token = "";
             }
         }
@@ -506,12 +506,12 @@ public class NetworkREST : MonoBehaviour
         // let's start with the easy part: they tell me
         // where the .xml is, I open it and read it
         string mainFilePath = exercisePath + "\\main.xml";
-        Debug.Log("The path i search for the xml is " + mainFilePath);
+        //Debug.Log("The path i search for the xml is " + mainFilePath);
 
         if (File.Exists(mainFilePath))
         {
             xmldata.LoadXML(mainFilePath);
-            Debug.Log("I actually read it!");
+            //Debug.Log("I actually read it!");
 
             // since it's really working we can
             // create the JSON structure to send
@@ -612,7 +612,7 @@ public class NetworkREST : MonoBehaviour
                 byte[] bytes = File.ReadAllBytes(fullPath);
 
                 string base64String = System.Convert.ToBase64String(bytes);
-                Debug.Log("codifica dell'immagine: " + base64String);
+                // Debug.Log("codifica dell'immagine: " + base64String);
 
                 JSONObject nested_fields_lvl2BI = new JSONObject(JSONObject.Type.OBJECT);
                 nested_fields_lvl2BI.AddField("filename", TrailPreferences.backgroundTexturePath);
@@ -654,7 +654,7 @@ public class NetworkREST : MonoBehaviour
                         errorHandler = RestError.ServerError;
                         break;
                     default:
-                        Debug.Log("OH SHIT");
+                        //Debug.Log("OH SHIT");
                         break;
                 }
                 allProper = false;
@@ -664,7 +664,7 @@ public class NetworkREST : MonoBehaviour
 
             if (allProper)
             {
-                Debug.Log(result);
+                //Debug.Log(result);
                 // not really much to do if the exercise has been uploaded properly
             }
 
@@ -678,10 +678,6 @@ public class NetworkREST : MonoBehaviour
 
     }
 
-    //---------------------------------------------------------------------
-    //------------------------  TESTING METHODS  --------------------------
-    //---------------------------------------------------------------------
-
     // Use this to do a POST for a paint exercise
     public IEnumerator POSTPaintExercise(string exercisePath)
     {
@@ -693,41 +689,49 @@ public class NetworkREST : MonoBehaviour
         // let's start with the easy part: they tell me
         // where the .xml is, I open it and read it
         string mainFilePath = exercisePath + "\\main.xml";
-        Debug.Log("The path i search for the xml is " + mainFilePath);
+        //Debug.Log("The path i search for the xml is " + mainFilePath);
 
         if (File.Exists(mainFilePath))
         {
             xmldata.LoadXML(mainFilePath);
-            Debug.Log("I actually read it!");
+            //Debug.Log("I actually read it!");
 
             // since it's really working we can
             // create the JSON structure to send
 
             JSONObject nested_fields_lvl1 = new JSONObject(JSONObject.Type.OBJECT);
 
-
             nested_fields_lvl1.AddField("patient_id", PaintPreferences.patientID);
             nested_fields_lvl1.AddField("start_datetime", PaintPreferences.initTime);
             nested_fields_lvl1.AddField("end_datetime", PaintPreferences.endTime);
+            nested_fields_lvl1.AddField("patient_only", PaintPreferences.patientOnly.ToString().ToLower());
 
             // I have to get all the doctors involved
             // and pick out the first since it is the logged one
             string list_of_doctors = string.Join(", ", PaintPreferences.doctorsIDs.Skip(1).ToArray());
             nested_fields_lvl1.AddField("other_doctors", "[" + list_of_doctors + "]");
 
-            // ok, let's start with the big issues... trails colors
-            //nested_fields_lvl1.AddField("enabled_therapist_left", PaintPreferences.othersSX_trailsEnabled.ToString().ToLower());
-            //if (PaintPreferences.othersSX_trailsEnabled == true)
-            //{
-            //    JSONObject nested_fields_lvl2TL = new JSONObject(JSONObject.Type.OBJECT);
-            //    nested_fields_lvl2TL.AddField("d", PaintPreferences.trailsDimension);
-            //    nested_fields_lvl2TL.AddField("a", PaintPreferences.othersSX_trailsColor.a.ToString());
-            //    nested_fields_lvl2TL.AddField("r", PaintPreferences.othersSX_trailsColor.r.ToString());
-            //    nested_fields_lvl2TL.AddField("g", PaintPreferences.othersSX_trailsColor.g.ToString());
-            //    nested_fields_lvl2TL.AddField("b", PaintPreferences.othersSX_trailsColor.b.ToString());
+            JSONObject nested_fields_lvl2D = new JSONObject(JSONObject.Type.OBJECT);
+            int count = 0;
+            foreach (float dimension in PaintPreferences.paintDim)
+            {
+                count += 1;
+                nested_fields_lvl2D.AddField("d" + count.ToString(), dimension);
+            }
+            nested_fields_lvl1.AddField("dimension", nested_fields_lvl2D);
 
-            //    nested_fields_lvl1.AddField("therapist_left_trail_color", nested_fields_lvl2TL);
-            //}
+            count = 0;
+            foreach (Color single_color in PaintPreferences.paintColor)
+            {
+                JSONObject nested_fields_lvl2C = new JSONObject(JSONObject.Type.OBJECT);
+                count += 1;
+                nested_fields_lvl2C.AddField("a", single_color.a);
+                nested_fields_lvl2C.AddField("r", single_color.r);
+                nested_fields_lvl2C.AddField("g", single_color.g);
+                nested_fields_lvl2C.AddField("b", single_color.b);
+
+                nested_fields_lvl1.AddField("color" + count.ToString(), nested_fields_lvl2C);
+            }
 
             if (PaintPreferences.colorFilterEnabled == true)
             {
@@ -740,6 +744,8 @@ public class NetworkREST : MonoBehaviour
                 nested_fields_lvl1.AddField("color_filter", nested_fields_lvl2CF);
             }
 
+            // I have to set it here because srly that is fucked up
+            PaintPreferences.backgroundIsImage = false;
             // now the part which is going to be a mess, about the backgrounds
             if (PaintPreferences.backgroundIsImage == false)
             {
@@ -758,7 +764,7 @@ public class NetworkREST : MonoBehaviour
                 byte[] bytes = File.ReadAllBytes(fullPath);
 
                 string base64String = Convert.ToBase64String(bytes);
-                Debug.Log("codifica dell'immagine: " + base64String);
+                //Debug.Log("codifica dell'immagine: " + base64String);
 
                 JSONObject nested_fields_lvl2BI = new JSONObject(JSONObject.Type.OBJECT);
                 nested_fields_lvl2BI.AddField("filename", PaintPreferences.backgroundTexturePath);
@@ -807,7 +813,7 @@ public class NetworkREST : MonoBehaviour
                         errorHandler = RestError.ServerError;
                         break;
                     default:
-                        Debug.Log("OH SHIT");
+                        // Debug.Log("OH SHIT");
                         break;
                 }
                 allProper = false;
@@ -817,7 +823,7 @@ public class NetworkREST : MonoBehaviour
 
             if (allProper)
             {
-                Debug.Log(result);
+                //Debug.Log(result);
             }
 
         }
@@ -829,5 +835,11 @@ public class NetworkREST : MonoBehaviour
         yield return result;
 
     }
+
+
+    //---------------------------------------------------------------------
+    //------------------------  TESTING METHODS  --------------------------
+    //---------------------------------------------------------------------
+
 
 }

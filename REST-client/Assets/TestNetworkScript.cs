@@ -71,16 +71,23 @@ public class TestNetworkScript : MonoBehaviour {
             //				Debug.Log ("There has been an error: " + client.errorHandler);
             //			} 
 
+
             // Ok, let's try now to get the post exercise to work.
-            //string path_of_exercise = "/users/lorenzosciandra/documents/workspace-testing-lorenzo" +
-            //	"/unity-projects/rest-client-testing/rest-client/assets/sessions/20160203/aldobo/" +
-            //	"trails_1138";
             string path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\rest-client-unity-test\\REST-client\\Assets\\Sessions\\20160203\\AldoBo\\TRAILS_1138";
             yield return StartCoroutine(client.POSTTrailExercise(path_of_exercise));
             if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
             {
                 Debug.Log("There has been an error: " + client.errorHandler);
             }
+
+            // the paint POST 
+            path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\rest-client-unity-test\\REST-client\\Assets\\Sessions\\20160203\\AldoBo\\PAINT_1707";
+            yield return StartCoroutine(client.POSTPaintExercise(path_of_exercise));
+            if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
+            {
+                Debug.Log("There has been an error: " + client.errorHandler);
+            }
+
         }
 	}
 
