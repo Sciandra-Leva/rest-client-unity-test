@@ -3,6 +3,7 @@
 // A small library to handle communication with our RESTful services
 // in the backend server.
 // Developed by: Lorenzo Sciandra
+// v0.31 - added new url
 // v0.3 - fixed server not online error handling
 // v0.2 - changed JSON library
 //---------------------------------------------------------------------
