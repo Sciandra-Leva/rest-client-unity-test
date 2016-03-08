@@ -27,7 +27,8 @@ public enum RestError
 	ZeroPatients,
 	UnAuthorized,
     NotLoggedIn,
-    XMLNotPresent
+    XMLNotPresent,
+    GenericLoginError
 }
 
 public enum RestSession
@@ -45,7 +46,7 @@ public class NetworkREST : MonoBehaviour
     //---------------------------------------------------------------------
 
     static string baseURL = "http://dev.painteraction.org";
-    //	static string baseURL = "http://localhost:3000";
+    // static string baseURL = "http://localhost:3000";
     // static string baseURL = "http://painteraction:3000/";
 
 
@@ -102,29 +103,31 @@ public class NetworkREST : MonoBehaviour
         }
         catch (WebException ex)
         {
-            Debug.Log("exception: " + ex);
+            Debug.Log("TESTexception: " + ex);
             var response = ex.Response as HttpWebResponse;
+            errorHandler = RestError.GenericLoginError;
+
             if (response != null)
             {
                 Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                switch ((int)response.StatusCode)
+                {
+
+                    case 400:
+                        errorHandler = RestError.WrongMail;
+                        break;
+                    case 401:
+                        errorHandler = RestError.WrongPassword;
+                        break;
+                    case 500:
+                        errorHandler = RestError.ServerError;
+                        break;
+                    default:
+                        // Debug.Log("OH SHIT");
+                        break;
+                }
             }
 
-            switch ((int)response.StatusCode)
-            {
-
-                case 400:
-                    errorHandler = RestError.WrongMail;
-                    break;
-                case 401:
-                    errorHandler = RestError.WrongPassword;
-                    break;
-                case 500:
-                    errorHandler = RestError.ServerError;
-                    break;
-                default:
-                    // Debug.Log("OH SHIT");
-                    break;
-            }
             allProper = false;
         }
 
