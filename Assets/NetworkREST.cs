@@ -28,7 +28,14 @@ public enum RestError
 	UnAuthorized,
     NotLoggedIn,
     XMLNotPresent,
-    GenericLoginError
+    GenericLoginError,
+    GenericGetUserListError,
+    GenericGetPatientListError,
+    GenericLogoutError,
+    GenericForceLogoutError,
+    GenericFinalLogoutError,
+    GenericPostTrailError,
+    GenericPostPaintError
 }
 
 public enum RestSession
@@ -48,7 +55,6 @@ public class NetworkREST : MonoBehaviour
     static string baseURL = "http://dev.painteraction.org";
     // static string baseURL = "http://localhost:3000";
     // static string baseURL = "http://painteraction:3000/";
-
 
     static string login_url = baseURL + "/api/v1/sessions";
     static string force_logout_url = baseURL + "/api/v1/force_logout";
@@ -123,7 +129,6 @@ public class NetworkREST : MonoBehaviour
                         errorHandler = RestError.ServerError;
                         break;
                     default:
-                        // Debug.Log("OH SHIT");
                         break;
                 }
             }
@@ -177,23 +182,25 @@ public class NetworkREST : MonoBehaviour
         {
             Debug.Log("exception: " + ex);
             var response = ex.Response as HttpWebResponse;
+            errorHandler = RestError.GenericGetUserListError;
+
             if (response != null)
             {
                 Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-            }
-            switch ((int)response.StatusCode)
-            {
+                switch ((int)response.StatusCode)
+                {
 
-                case 401:
-                    errorHandler = RestError.ZeroDoctors;
-                    break;
-                case 500:
-                    errorHandler = RestError.ServerError;
-                    break;
-                default:
-                    // Debug.Log("OH SHIT");
-                    break;
+                    case 401:
+                        errorHandler = RestError.ZeroDoctors;
+                        break;
+                    case 500:
+                        errorHandler = RestError.ServerError;
+                        break;
+                    default:
+                        break;
+                }
             }
+
             allProper = false;
         }
 
@@ -251,23 +258,25 @@ public class NetworkREST : MonoBehaviour
         {
             Debug.Log("exception: " + ex);
             var response = ex.Response as HttpWebResponse;
+            errorHandler = RestError.GenericGetPatientListError;
+
             if (response != null)
             {
                 Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-            }
-            switch ((int)response.StatusCode)
-            {
+                switch ((int)response.StatusCode)
+                {
 
-                case 401:
-                    errorHandler = RestError.ZeroPatients;
-                    break;
-                case 500:
-                    errorHandler = RestError.ServerError;
-                    break;
-                default:
-                    // Debug.Log("OH SHIT");
-                    break;
+                    case 401:
+                        errorHandler = RestError.ZeroPatients;
+                        break;
+                    case 500:
+                        errorHandler = RestError.ServerError;
+                        break;
+                    default:
+                        break;
+                }
             }
+           
             allProper = false;
         }
 
@@ -335,21 +344,22 @@ public class NetworkREST : MonoBehaviour
             {
                 Debug.Log("exception: " + ex);
                 var response = ex.Response as HttpWebResponse;
+                errorHandler = RestError.GenericLogoutError;
+
                 if (response != null)
                 {
                     Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                }
-                switch ((int)response.StatusCode)
-                {
-                    case 401:
-                        errorHandler = RestError.UnAuthorized;
-                        break;
-                    case 500:
-                        errorHandler = RestError.ServerError;
-                        break;
-                    default:
-                        // Debug.Log("OH SHIT");
-                        break;
+                    switch ((int)response.StatusCode)
+                    {
+                        case 401:
+                            errorHandler = RestError.UnAuthorized;
+                            break;
+                        case 500:
+                            errorHandler = RestError.ServerError;
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 allProper = false;
             }
@@ -401,22 +411,24 @@ public class NetworkREST : MonoBehaviour
             {
                 Debug.Log("exception: " + ex);
                 var response = ex.Response as HttpWebResponse;
+                errorHandler = RestError.GenericForceLogoutError;
+
                 if (response != null)
                 {
                     Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                    switch ((int)response.StatusCode)
+                    {
+                        case 401:
+                            errorHandler = RestError.UnAuthorized;
+                            break;
+                        case 500:
+                            errorHandler = RestError.ServerError;
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                switch ((int)response.StatusCode)
-                {
-                    case 401:
-                        errorHandler = RestError.UnAuthorized;
-                        break;
-                    case 500:
-                        errorHandler = RestError.ServerError;
-                        break;
-                    default:
-                        // Debug.Log("OH SHIT");
-                        break;
-                }
+                
                 allProper = false;
 
             }
@@ -470,22 +482,24 @@ public class NetworkREST : MonoBehaviour
             {
                 Debug.Log("exception: " + ex);
                 var response = ex.Response as HttpWebResponse;
+                errorHandler = RestError.GenericFinalLogoutError;
+
                 if (response != null)
                 {
                     Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                    switch ((int)response.StatusCode)
+                    {
+                        case 401:
+                            errorHandler = RestError.UnAuthorized;
+                            break;
+                        case 500:
+                            errorHandler = RestError.ServerError;
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                switch ((int)response.StatusCode)
-                {
-                    case 401:
-                        errorHandler = RestError.UnAuthorized;
-                        break;
-                    case 500:
-                        errorHandler = RestError.ServerError;
-                        break;
-                    default:
-                        // Debug.Log("OH SHIT");
-                        break;
-                }
+               
                 allProper = false;
             }
 
@@ -646,20 +660,21 @@ public class NetworkREST : MonoBehaviour
             {
                 Debug.Log("exception: " + ex);
                 var response = ex.Response as HttpWebResponse;
+                errorHandler = RestError.GenericPostTrailError;
+
                 if (response != null)
                 {
                     Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                    switch ((int)response.StatusCode)
+                    {
+                        case 500:
+                            errorHandler = RestError.ServerError;
+                            break;
+                        default:
+                            break;
+                    }
                 }
 
-                switch ((int)response.StatusCode)
-                {
-                    case 500:
-                        errorHandler = RestError.ServerError;
-                        break;
-                    default:
-                        //Debug.Log("OH SHIT");
-                        break;
-                }
                 allProper = false;
             }
 
@@ -798,26 +813,27 @@ public class NetworkREST : MonoBehaviour
             {
                 Debug.Log("exception: " + ex);
                 var response = ex.Response as HttpWebResponse;
+                errorHandler = RestError.GenericPostPaintError;
+
                 if (response != null)
                 {
                     Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                }
+                    switch ((int)response.StatusCode)
+                    {
 
-                switch ((int)response.StatusCode)
-                {
-
-                    //			case 400:
-                    //				errorHandler = RestError.WrongMail;
-                    //				break;
-                    //			case 401:
-                    //				errorHandler = RestError.WrongPassword;
-                    //				break;
-                    case 500:
-                        errorHandler = RestError.ServerError;
-                        break;
-                    default:
-                        // Debug.Log("OH SHIT");
-                        break;
+                        //			case 400:
+                        //				errorHandler = RestError.WrongMail;
+                        //				break;
+                        //			case 401:
+                        //				errorHandler = RestError.WrongPassword;
+                        //				break;
+                        case 500:
+                            errorHandler = RestError.ServerError;
+                            break;
+                        default:
+                            // Debug.Log("OH SHIT");
+                            break;
+                    }
                 }
                 allProper = false;
             }
