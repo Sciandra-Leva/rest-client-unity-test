@@ -53,7 +53,8 @@ public class NetworkREST : MonoBehaviour
     //---------------------------  VARIABLES  -----------------------------
     //---------------------------------------------------------------------
 
-    static string baseURL = "http://dev.painteraction.org";
+    static string baseURL = "http://ec2-52-58-50-250.eu-central-1.compute.amazonaws.com/";
+    // static string baseURL = "http://dev.painteraction.org";
     // static string baseURL = "http://localhost:3000";
     // static string baseURL = "http://painteraction:3000/";
 
