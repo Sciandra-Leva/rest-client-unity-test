@@ -3,6 +3,7 @@
 // A small library to handle communication with our RESTful services
 // in the backend server.
 // Developed by: Lorenzo Sciandra
+// v0.3 - fixed server not online error handling
 // v0.2 - changed JSON library
 //---------------------------------------------------------------------
 
@@ -276,7 +277,7 @@ public class NetworkREST : MonoBehaviour
                         break;
                 }
             }
-           
+
             allProper = false;
         }
 
@@ -428,7 +429,7 @@ public class NetworkREST : MonoBehaviour
                             break;
                     }
                 }
-                
+
                 allProper = false;
 
             }
@@ -499,7 +500,7 @@ public class NetworkREST : MonoBehaviour
                             break;
                     }
                 }
-               
+
                 allProper = false;
             }
 
@@ -854,7 +855,6 @@ public class NetworkREST : MonoBehaviour
         yield return result;
 
     }
-
 
     //---------------------------------------------------------------------
     //------------------------  TESTING METHODS  --------------------------
