@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+  <Session>
+    <InitTime>2/3/2016 11:44:07 AM</InitTime>
+    <EndTime>2/3/2016 11:44:42 AM</EndTime>
+    <PatientID>P0256</PatientID>
+    <PatientName>AldoBo</PatientName>
+    <DoctorsIDs>
+      <DocID>h</DocID>
+      <DocID>D03</DocID>
+      <DocID>D01</DocID>
+      <DocID>D02</DocID>
+    </DoctorsIDs>
+  </Session>
+  <background>
+    <bgLayer>
+      <image>northern-lights-christmas-background-1366-768-618491.jpeg</image>
+      <!-- string: file path + name -->
+      <color>#000D0D</color>
+      <!-- #ffffff or #fff or ffffff or fff -->
+    </bgLayer>
+    <rgbaLayer>
+      <enabled>true</enabled>
+      <!-- bool -->
+      <alpha>0.4928571</alpha>
+      <!-- float -->
+    </rgbaLayer>
+    <filterLayer>
+      <color>#FF79EC</color>
+      <!-- #ffffff or #fff or ffffff or fff -->
+      <alpha>0.2628572</alpha>
+      <!-- float -->
+    </filterLayer>
+  </background>
+  <physics>
+    <color>Green</color>
+    <size>30</size>
+    <weight>16.44</weight>
+    <bounciness>1.00</bounciness>
+    <patientOnly>False</patientOnly>
+  </physics>
+</xml>
