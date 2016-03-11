@@ -55,10 +55,10 @@ public class NetworkREST : MonoBehaviour
     //---------------------------  VARIABLES  -----------------------------
     //---------------------------------------------------------------------
 
-    static string baseURL = "http://ec2-52-58-50-250.eu-central-1.compute.amazonaws.com/";
+    // static string baseURL = "http://ec2-52-58-50-250.eu-central-1.compute.amazonaws.com/";
     // static string baseURL = "http://dev.painteraction.org";
     // static string baseURL = "http://localhost:3000";
-    // static string baseURL = "http://painteraction:3000/";
+    static string baseURL = "http://painteraction:3000/";
 
     static string login_url = baseURL + "/api/v1/sessions";
     static string force_logout_url = baseURL + "/api/v1/force_logout";
@@ -219,6 +219,7 @@ public class NetworkREST : MonoBehaviour
 
         if (allProper)
         {
+            //Debug.Log(result);
 
             JSONObject root_users = new JSONObject(answer_text);
 
@@ -228,12 +229,13 @@ public class NetworkREST : MonoBehaviour
             {
                 Dictionary<string, string> decoded_user = user.ToDictionary();
                 listOfDoctors.Add(new Person()
-                    {
-                        ID = decoded_user["id"],
-                        name = decoded_user["complete_name"],
-                        age = int.Parse(decoded_user["age"]),
-                        type = Person.Type.Doctor,
-                        photo = baseURL + decoded_user["user_avatar"]
+                {
+                    ID = decoded_user["id"],
+                    name = decoded_user["complete_name"],
+                    age = int.Parse(decoded_user["age"]),
+                    type = Person.Type.Doctor,
+                    //photo = baseURL + decoded_user["user_avatar"]
+                    photo = System.Text.RegularExpressions.Regex.Unescape(decoded_user["user_avatar_url"])
                     }
                 );
             }
@@ -295,6 +297,8 @@ public class NetworkREST : MonoBehaviour
 
         if (allProper)
         {
+            //Debug.Log(result);
+
             JSONObject root_patients = new JSONObject(answer_text);
 
             JSONObject nested_patients = root_patients.list[0];
@@ -308,7 +312,8 @@ public class NetworkREST : MonoBehaviour
                     name = decoded_patient["complete_name"],
                     age = int.Parse(decoded_patient["age"]),
                     type = Person.Type.Patient,
-                    photo = baseURL + decoded_patient["patient_avatar"]
+                    photo = System.Text.RegularExpressions.Regex.Unescape(decoded_patient["patient_avatar_url"])
+                    //photo = baseURL + decoded_patient["patient_avatar"]
                 }
                 );
             }
@@ -378,7 +383,7 @@ public class NetworkREST : MonoBehaviour
             yield return myHttpWebResponse;
             if (allProper)
             {
-                //Debug.Log(answer_text);
+                Debug.Log(answer_text);
             }
         }
     }
@@ -447,7 +452,7 @@ public class NetworkREST : MonoBehaviour
             yield return myHttpWebResponse;
             if (allProper)
             {
-                //Debug.Log(answer_text);
+                Debug.Log(answer_text);
                 token = "";
             }
         }
@@ -516,7 +521,7 @@ public class NetworkREST : MonoBehaviour
 
             if (allProper)
             {
-                //Debug.Log(answer_text);
+                Debug.Log(answer_text);
                 token = "";
             }
         }
@@ -655,6 +660,7 @@ public class NetworkREST : MonoBehaviour
             root_trail.AddField("trail", nested_fields_lvl1);
 
             string encodedString = root_trail.ToString();
+            Debug.Log(encodedString);
 
             //the actual call, in a try catch
             try
@@ -693,7 +699,7 @@ public class NetworkREST : MonoBehaviour
 
             if (allProper)
             {
-                //Debug.Log(result);
+                Debug.Log(result);
                 // not really much to do if the exercise has been uploaded properly
             }
 
@@ -704,6 +710,11 @@ public class NetworkREST : MonoBehaviour
         }
 
         yield return result;
+
+        if (allProper)
+        {
+            Debug.Log(result);
+        }
 
     }
 
@@ -803,11 +814,30 @@ public class NetworkREST : MonoBehaviour
                 nested_fields_lvl1.AddField("background_image", nested_fields_lvl2BI);
             }
 
+            string drawingFilePath = exercisePath + "\\Paint_Drawing.png";
+
+            if (File.Exists(drawingFilePath))
+            {
+                byte[] bytes = File.ReadAllBytes(drawingFilePath);
+
+                string base64String = Convert.ToBase64String(bytes);
+                //Debug.Log("codifica dell'immagine: " + base64String);
+
+                JSONObject nested_fields_lvl2PD= new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2PD.AddField("filename", "Paint_Drawing.png");
+                nested_fields_lvl2PD.AddField("content", base64String);
+                nested_fields_lvl2PD.AddField("content_type", "image/png");
+
+                nested_fields_lvl1.AddField("paint_drawing", nested_fields_lvl2PD);
+            }
+
             // finally, everything goes back in to trails
             JSONObject root_paint = new JSONObject(JSONObject.Type.OBJECT);
             root_paint.AddField("paint", nested_fields_lvl1);
 
             string encodedString = root_paint.ToString();
+            Debug.Log(encodedString);
+
 
             //the actual call, in a try catch
             try
@@ -862,6 +892,11 @@ public class NetworkREST : MonoBehaviour
         }
 
         yield return result;
+
+        if (allProper)
+        {
+            Debug.Log(result);
+        }
 
     }
 

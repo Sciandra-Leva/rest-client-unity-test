@@ -27,7 +27,7 @@
     <filterLayer>
       <color>#868AFF00</color>
       <!-- #ffffff or #fff or ffffff or fff -->
-      <alpha>0</alpha>
+      <alpha>0.5555555</alpha>
       <!-- float -->
     </filterLayer>
   </background>

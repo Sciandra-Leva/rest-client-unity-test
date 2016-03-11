@@ -59,8 +59,12 @@ public class TestNetworkScript : MonoBehaviour {
             Debug.Log("To test the freshly populated lists: " +
                 "First Patient registered: " +
                 listOfPatients.ElementAt(0).name +
+                "And a photo url is:" +
+                listOfPatients.ElementAt(0).photo +
                 " and the first Doctor registered: " +
-                listOfDoctors.ElementAt(0).name
+                listOfDoctors.ElementAt(0).name +
+                "And a photo url is:" +
+                listOfDoctors.ElementAt(0).photo
             );
 
             // this is the one used to log out the 
@@ -73,7 +77,7 @@ public class TestNetworkScript : MonoBehaviour {
 
 
             // Ok, let's try now to get the post exercise to work.
-            string path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\workspace-leva\\rest-client-unity-test\\Assets\\Sessions\\20160203\\OlivieroManzari\\TRAILS_0939";
+           string path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\workspace-leva\\rest-client-unity-test\\Assets\\Sessions\\20160203\\OlivieroManzari\\TRAILS_0939";
             yield return StartCoroutine(client.POSTTrailExercise(path_of_exercise));
             if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
             {
