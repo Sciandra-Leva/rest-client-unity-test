@@ -3,6 +3,7 @@
 // A small library to handle communication with our RESTful services
 // in the backend server.
 // Developed by: Lorenzo Sciandra
+// v0.4 - added the drawing in Paint, and some fixes. Moreover picture's url should be enough
 // v0.32 - fixed path of background image and added a complete name field
 // v0.31 - added new url
 // v0.3 - fixed server not online error handling
@@ -55,10 +56,10 @@ public class NetworkREST : MonoBehaviour
     //---------------------------  VARIABLES  -----------------------------
     //---------------------------------------------------------------------
 
-    // static string baseURL = "http://ec2-52-58-50-250.eu-central-1.compute.amazonaws.com/";
+    static string baseURL = "http://ec2-52-58-50-250.eu-central-1.compute.amazonaws.com/";
     // static string baseURL = "http://dev.painteraction.org";
     // static string baseURL = "http://localhost:3000";
-    static string baseURL = "http://painteraction:3000/";
+    // static string baseURL = "http://painteraction:3000/";
 
     static string login_url = baseURL + "/api/v1/sessions";
     static string force_logout_url = baseURL + "/api/v1/force_logout";
@@ -76,9 +77,6 @@ public class NetworkREST : MonoBehaviour
     public RestSession sessionsHandler = RestSession.AllGood;
     public string logged_user_complete_name;
     public string logged_user_id;
-
-
-
 
     //---------------------------------------------------------------------
     //-------------------------  PUBLIC METHODS  --------------------------
@@ -553,7 +551,7 @@ public class NetworkREST : MonoBehaviour
 
             nested_fields_lvl1.AddField("patient_id", TrailPreferences.patientID);
             nested_fields_lvl1.AddField("time_to_live", TrailPreferences.trailsTimeToLive);
-            nested_fields_lvl1.AddField("typology", TrailPreferences.trailsType);
+            nested_fields_lvl1.AddField("typology", TrailPreferences.trailsType.ToString());
             nested_fields_lvl1.AddField("start_datetime", TrailPreferences.initTime);
             nested_fields_lvl1.AddField("end_datetime", TrailPreferences.endTime);
             nested_fields_lvl1.AddField("special_fx", TrailPreferences.trailsSpecialFX.ToString().ToLower());
