@@ -73,7 +73,7 @@ public class TestNetworkScript : MonoBehaviour {
 
 
             // Ok, let's try now to get the post exercise to work.
-            string path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\rest-client-unity-test\\REST-client\\Assets\\Sessions\\20160203\\AldoBo\\TRAILS_1138";
+            string path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\workspace-leva\\rest-client-unity-test\\Assets\\Sessions\\20160203\\OlivieroManzari\\TRAILS_0939";
             yield return StartCoroutine(client.POSTTrailExercise(path_of_exercise));
             if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
             {
@@ -81,7 +81,7 @@ public class TestNetworkScript : MonoBehaviour {
             }
 
             // the paint POST 
-            path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\rest-client-unity-test\\REST-client\\Assets\\Sessions\\20160203\\AldoBo\\PAINT_1707";
+            path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\workspace-leva\\rest-client-unity-test\\Assets\\Sessions\\20160203\\OlivieroManzari\\PAINT_0939";
             yield return StartCoroutine(client.POSTPaintExercise(path_of_exercise));
             if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
             {

@@ -1,5 +1,11 @@
 /* File BgPreferences C# implementation of class BgPreferences */
 
+/*	      Computer Graphics and Vision Group	  */
+/*		  Politecnico di Torino			  */
+/*							  */
+/*  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF POLITO */
+/*  The copyright notice above does not evidence any      */
+/*  actual or intended publication of such source code.   */
 
 
 // global declaration start
@@ -60,30 +66,27 @@ public static bool backgroundIsImage = false;
 
 
     protected virtual string GetNodeFromXML(string root, string nodeTag, string nodeAttribute)
-	{ 
-		string xmlPath = new System.Text.StringBuilder ("/").Append (root).Append ("/").Append (nodeTag).Append ("/").Append (nodeAttribute).ToString (); 
+    { 
+        	string xmlPath = new System.Text.StringBuilder("/").Append(root).Append("/").Append(nodeTag).Append("/").Append(nodeAttribute).ToString(); 
             
-		XmlNode xmlNode = xmlDoc.DocumentElement.SelectSingleNode (xmlPath);
+    	XmlNode xmlNode = xmlDoc.DocumentElement.SelectSingleNode(xmlPath);
             
-		if (xmlNode == null || String.IsNullOrEmpty (xmlNode.InnerText))
-		{
-			Debug.Log ("Something went very wrong very fast");
-			return "fuck";
-		}
-    	else
-		{
-    		return(xmlNode.InnerText);
-    
-		}
-	}
+    	//if( xmlNode == null || String.IsNullOrEmpty(xmlNode.InnerText) )
+    	//	return defaultValue;
+    	//else
+    	return(xmlNode.InnerText);
+    }
 
 
     protected Color ConvertHextoColor(string HexColor, float alpha)
     {
+    	Color convertedColor;
+    
     	string tmpColor = "";
     	int R = 0;
     	int G = 0;
     	int B = 0;
+    	int A = 0;
             
     	if(HexColor.Contains("#")) 
     		tmpColor = HexColor.Substring(1);
@@ -95,20 +98,36 @@ public static bool backgroundIsImage = false;
     		R = int.Parse(tmpColor.Substring(0,2), System.Globalization.NumberStyles.AllowHexSpecifier);
     		G = int.Parse(tmpColor.Substring(2,2), System.Globalization.NumberStyles.AllowHexSpecifier);
     		B = int.Parse(tmpColor.Substring(4,2), System.Globalization.NumberStyles.AllowHexSpecifier);
+    		convertedColor = new Color ( R/255f, G/255f, B/255f, alpha );
     	}
     	else if ( tmpColor.Length == 3 )
     	{
     		R = int.Parse( (tmpColor.Substring(0,1)+tmpColor.Substring(0,1)), System.Globalization.NumberStyles.AllowHexSpecifier);
     		G = int.Parse(tmpColor.Substring(1,1)+tmpColor.Substring(1,1), System.Globalization.NumberStyles.AllowHexSpecifier);
     		B = int.Parse(tmpColor.Substring(2,1)+tmpColor.Substring(2,1), System.Globalization.NumberStyles.AllowHexSpecifier);
+    		convertedColor = new Color ( R/255f, G/255f, B/255f, alpha );
+    	}
+    	if( tmpColor.Length == 8 )
+    	{
+    		R = int.Parse(tmpColor.Substring(0,2), System.Globalization.NumberStyles.AllowHexSpecifier);
+    		G = int.Parse(tmpColor.Substring(2,2), System.Globalization.NumberStyles.AllowHexSpecifier);
+    		B = int.Parse(tmpColor.Substring(4,2), System.Globalization.NumberStyles.AllowHexSpecifier);
+    		A = int.Parse(tmpColor.Substring(6,2), System.Globalization.NumberStyles.AllowHexSpecifier);
+    		convertedColor = new Color ( R/255f, G/255f, B/255f, A/255f );
+    	}
+    	else if ( tmpColor.Length == 4 )
+    	{
+    		R = int.Parse( (tmpColor.Substring(0,1)+tmpColor.Substring(0,1)), System.Globalization.NumberStyles.AllowHexSpecifier);
+    		G = int.Parse(tmpColor.Substring(1,1)+tmpColor.Substring(1,1), System.Globalization.NumberStyles.AllowHexSpecifier);
+    		B = int.Parse(tmpColor.Substring(2,1)+tmpColor.Substring(2,1), System.Globalization.NumberStyles.AllowHexSpecifier);
+    		A = int.Parse(tmpColor.Substring(3,1)+tmpColor.Substring(3,1), System.Globalization.NumberStyles.AllowHexSpecifier);
+    		convertedColor = new Color ( R/255f, G/255f, B/255f, A/255f );
     	}
     	else
     	{
-    		Debug.LogError( new System.Text.StringBuilder("ConvertHextoColor :: Error, ").Append(HexColor).Append(" format is invalid!") ); 
+    		if(PIPars.Debug) Debug.LogError( new System.Text.StringBuilder("ConvertHextoColor :: Error, ").Append(HexColor).Append(" format is invalid!") ); 
     		return Color.black;
     	}
-            
-    	Color convertedColor = new Color ( R/255f, G/255f, B/255f, alpha );
             
     	return convertedColor;
     }
@@ -120,12 +139,14 @@ public static bool backgroundIsImage = false;
     	int R = 0;
     	int G = 0;
     	int B = 0;
+    	int A = 0;
     
     	R = Mathf.RoundToInt(col.r * 255);
     	G = Mathf.RoundToInt(col.g * 255);
     	B = Mathf.RoundToInt(col.b * 255);
+    	A = Mathf.RoundToInt(col.a * 255);
     	
-    	tmpColor = "#"+R.ToString("X2")+G.ToString("X2")+B.ToString("X2");
+    	tmpColor = "#"+R.ToString("X2")+G.ToString("X2")+B.ToString("X2")+A.ToString("X2");
     
     	return tmpColor;
     }
@@ -134,9 +155,9 @@ public static bool backgroundIsImage = false;
     protected virtual string[] GetNodesFromXML(string root, string nodeTag, string nodeAttribute)
     { 
         	string xmlPath = new System.Text.StringBuilder("/").Append(root).Append("/").Append(nodeTag).Append("/").Append(nodeAttribute).ToString(); 
-            
+           
     	XmlNode xmlNode = xmlDoc.DocumentElement.SelectSingleNode(xmlPath);
-            
+    
     	string[] children = new string[xmlNode.ChildNodes.Count];
     
     	for (int i = 0; i < xmlNode.ChildNodes.Count; i++)
@@ -152,11 +173,11 @@ public static bool backgroundIsImage = false;
 
     public virtual void LoadXML(string filename)
     {
-    	Debug.Log("Loading xml: "+filename);
+    	if(PIPars.Debug) Debug.Log("Loading xml: "+filename);
     	
     	if( !System.IO.File.Exists(filename) )
     	{
-    		Debug.LogError("Error :: LoadXML :: File not found @ "+filename);
+    		if(PIPars.Debug) Debug.LogError("Error :: LoadXML :: File not found @ "+filename);
     		return;
     	}
     
@@ -164,10 +185,10 @@ public static bool backgroundIsImage = false;
     
     	xmlCompletePath = filename;
         
-    	initTime = GetNodeFromXML("xml", "Session", "InitTime");
-    	endTime = GetNodeFromXML("xml", "Session", "EndTime");
-    	patientID = GetNodeFromXML("xml", "Session", "PatientID");
-    	doctorsIDs = GetNodesFromXML("xml", "Session", "DoctorsIDs").ToList();
+    	//initTime = GetNodeFromXML("xml", "Session", "InitTime");
+    	//endTime = GetNodeFromXML("xml", "Session", "EndTime");
+    	//patientID = GetNodeFromXML("xml", "Session", "PatientID");
+    	//doctorsIDs = GetNodesFromXML("xml", "Session", "DoctorsIDs").ToList();
     	
     
     ////// Reading BG Layer Settings
@@ -176,7 +197,7 @@ public static bool backgroundIsImage = false;
         	{
         		backgroundTexturePath = bgLayerImage;
     		backgroundIsImage = true;
-        		Debug.Log("LoadXML :: BGLayer :: Image :: "+backgroundTexturePath+" || "+bgLayerImage);
+        		if(PIPars.Debug) Debug.Log("LoadXML :: BGLayer :: Image :: "+backgroundTexturePath+" || "+bgLayerImage);
         	}
         	else
         	{
@@ -186,12 +207,12 @@ public static bool backgroundIsImage = false;
         		if( !string.IsNullOrEmpty(bgLayerColor) )
         		{
         			backgroundColor = ConvertHextoColor(bgLayerColor, 1f);
-        			Debug.Log("LoadXML :: BGLayer :: Color :: "+backgroundColor);
+        			if(PIPars.Debug) Debug.Log("LoadXML :: BGLayer :: Color :: "+backgroundColor);
         		}
         		else
         		{
         			backgroundColor = Color.white;
-        			Debug.Log("LoadXML :: BGLayer :: Color :: "+backgroundColor);
+        			if(PIPars.Debug) Debug.Log("LoadXML :: BGLayer :: Color :: "+backgroundColor);
         		}
         	}
         
@@ -208,11 +229,11 @@ public static bool backgroundIsImage = false;
         		{
         			kinectAlpha = 1f;
         		}
-        		Debug.Log("LoadXML :: RGBALayer :: Alpha :: "+kinectAlpha);
+        		if(PIPars.Debug) Debug.Log("LoadXML :: RGBALayer :: Alpha :: "+kinectAlpha);
         	}
         	else
         	{
-        		Debug.Log("LoadXML :: RGBALayer :: Disabled");
+        		if(PIPars.Debug) Debug.Log("LoadXML :: RGBALayer :: Disabled");
         		kinectEnabled = false;
         	}
         
@@ -237,19 +258,21 @@ public static bool backgroundIsImage = false;
         			}
         		}
         	}
-        	Debug.Log("LoadXML :: ColorFilterLayer :: Color :: "+colorFilter);
+        	if(PIPars.Debug) Debug.Log("LoadXML :: ColorFilterLayer :: Color :: "+colorFilter);
     }
 
 
     public virtual void SaveXML(string filename)
     {
-    	// Making a copy of the old configuration file
-    	System.IO.File.Copy(xmlCompletePath, xmlCompletePath+".old", true);
-    
     	if( !string.IsNullOrEmpty(filename) )
     		xmlCompletePath = filename;
-    	
-    	Debug.Log("Saving on XML... "+xmlCompletePath);
+    	else
+    	{
+    		// Making a copy of the old configuration file
+    		System.IO.File.Copy(xmlCompletePath, xmlCompletePath+".old", true);
+    	}
+    
+    	if(PIPars.Debug) Debug.Log("Saving on XML... "+xmlCompletePath);
     
     	//Changing all parameters with new values
     	// SESSION Parameters		
@@ -271,7 +294,7 @@ public static bool backgroundIsImage = false;
     
     	// BG Layer
     	if(backgroundTexturePath != null)
-    		xmlDoc.SelectSingleNode("//xml/background/bgLayer/image").InnerText = System.IO.Path.GetFileName(backgroundTexturePath);
+    		xmlDoc.SelectSingleNode("//xml/background/bgLayer/image").InnerText = backgroundTexturePath;
     	else
     		xmlDoc.SelectSingleNode("//xml/background/bgLayer/image").InnerText = "";
     		

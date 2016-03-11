@@ -3,6 +3,7 @@
 // A small library to handle communication with our RESTful services
 // in the backend server.
 // Developed by: Lorenzo Sciandra
+// v0.32 - fixed path of background image and added a complete name field
 // v0.31 - added new url
 // v0.3 - fixed server not online error handling
 // v0.2 - changed JSON library
@@ -73,6 +74,9 @@ public class NetworkREST : MonoBehaviour
 
     public RestError errorHandler = RestError.AllGood;
     public RestSession sessionsHandler = RestSession.AllGood;
+    public string logged_user_complete_name;
+    public string logged_user_id;
+
 
 
 
@@ -148,6 +152,10 @@ public class NetworkREST : MonoBehaviour
             // this won't work everytime
             Dictionary<string, string> decoded_response = j.ToDictionary();
             token = decoded_response["token"];
+            logged_user_complete_name = decoded_response["complete_name"];
+            logged_user_id = decoded_response["id"];
+
+
             int sessionCounter = int.Parse(decoded_response["sessions_counter"]);
 
             if (sessionCounter > 0)
@@ -627,7 +635,7 @@ public class NetworkREST : MonoBehaviour
             }
             else
             {
-                string fullPath = Path.Combine(exercisePath, TrailPreferences.backgroundTexturePath);
+                string fullPath = Path.Combine(exercisePath, Path.GetFileName(TrailPreferences.backgroundTexturePath));
 
                 byte[] bytes = File.ReadAllBytes(fullPath);
 
@@ -780,7 +788,7 @@ public class NetworkREST : MonoBehaviour
             }
             else
             {
-                string fullPath = Path.Combine(exercisePath, PaintPreferences.backgroundTexturePath);
+                string fullPath = Path.Combine(exercisePath, Path.GetFileName(TrailPreferences.backgroundTexturePath));
 
                 byte[] bytes = File.ReadAllBytes(fullPath);
 
@@ -834,7 +842,6 @@ public class NetworkREST : MonoBehaviour
                             errorHandler = RestError.ServerError;
                             break;
                         default:
-                            // Debug.Log("OH SHIT");
                             break;
                     }
                 }
