@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+  <Session>
+    <InitTime>11/03/2016 09:54:52</InitTime>
+    <EndTime>11/03/2016 09:55:23</EndTime>
+    <PatientID>4</PatientID>
+    <PatientName>EleonoraBorgogni</PatientName>
+    <DoctorsIDs>
+      <DocID>bottino_test.com</DocID>
+      <DocID>4</DocID>
+    </DoctorsIDs>
+  </Session>
+  <background>
+    <bgLayer>
+      <image>sub\sub2\test2.jpg</image>
+      <!-- string: file path + name -->
+      <color>#FFFFFFFF</color>
+      <!-- #ffffff or #fff or ffffff or fff -->
+    </bgLayer>
+    <rgbaLayer>
+      <enabled>true</enabled>
+      <!-- bool -->
+      <alpha>0.2600584</alpha>
+      <!-- float -->
+    </rgbaLayer>
+    <filterLayer>
+      <color>#868AFF00</color>
+      <!-- #ffffff or #fff or ffffff or fff -->
+      <alpha>0</alpha>
+      <!-- float -->
+    </filterLayer>
+  </background>
+  <paint>
+    <numColors>8</numColors>
+    <colors>
+      <c01>#2D9600C4</c01>
+      <c02>#CFAB004A</c02>
+      <c03>#0D00CEC2</c03>
+      <c04>#A72EFFFF</c04>
+      <c05>#FF5B305A</c05>
+      <c06>#002E0DFF</c06>
+      <c07>#31FFCCFF</c07>
+      <c08>#5F00CEFF</c08>
+    </colors>
+    <dimensions>
+      <d01>7.37</d01>
+      <d02>20.40</d02>
+      <d03>28.47</d03>
+    </dimensions>
+    <sounds>
+      <s01>
+      </s01>
+      <s02>
+      </s02>
+      <s03>
+      </s03>
+      <s04>
+      </s04>
+      <s05>
+      </s05>
+      <s06>
+      </s06>
+      <s07>
+      </s07>
+      <s08>
+      </s08>
+    </sounds>
+    <emojs>
+      <e01>01.png</e01>
+      <e02>05.png</e02>
+      <e03>03.png</e03>
+      <e04>
+      </e04>
+      <e05>06.png</e05>
+      <e06>
+      </e06>
+      <e07>
+      </e07>
+      <e08>
+      </e08>
+    </emojs>
+    <patientOnly>False</patientOnly>
+  </paint>
+</xml>
