@@ -1,14 +1,16 @@
-﻿//---------------------------------------------------------------------
-//--------------------------  NetworkREST  ----------------------------
+﻿//---------------------------------------------------------------------------------------------------
+//-------------------------------------------  NetworkREST  -----------------------------------------
 // A small library to handle communication with our RESTful services
 // in the backend server.
 // Developed by: Lorenzo Sciandra
+// v0.5 - added the Ball POST, and fixed an issue related to the erroHandler to be resetted each call
+//        and some more code polishing
 // v0.4 - added the drawing in Paint, and some fixes. Moreover picture's url should be enough
 // v0.32 - fixed path of background image and added a complete name field
 // v0.31 - added new url
 // v0.3 - fixed server not online error handling
 // v0.2 - changed JSON library
-//---------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
 
 
 using UnityEngine;
@@ -39,7 +41,8 @@ public enum RestError
     GenericForceLogoutError,
     GenericFinalLogoutError,
     GenericPostTrailError,
-    GenericPostPaintError
+    GenericPostPaintError,
+    GenericPostBallError
 }
 
 public enum RestSession
@@ -56,17 +59,17 @@ public class NetworkREST : MonoBehaviour
     //---------------------------  VARIABLES  -----------------------------
     //---------------------------------------------------------------------
 
-    static string baseURL = "http://ec2-52-58-50-250.eu-central-1.compute.amazonaws.com/";
+    // static string baseURL = "http://ec2-52-58-50-250.eu-central-1.compute.amazonaws.com/";
     // static string baseURL = "http://dev.painteraction.org";
     // static string baseURL = "http://localhost:3000";
-    // static string baseURL = "http://painteraction:3000/";
+    static string baseURL = "http://painteraction:3000/";
 
     static string login_url = baseURL + "/api/v1/sessions";
     static string force_logout_url = baseURL + "/api/v1/force_logout";
     static string trails_url = baseURL + "/api/v1/trails";
     static string paints_url = baseURL + "/api/v1/paints";
-
-    //	static string balls_url = baseURL + "/api/v1/balls";
+    static string balls_url = baseURL + "/api/v1/balls";
+    
     //	static string vowels_url = baseURL + "/api/v1/vowels";
 
     private string token = "";
@@ -145,6 +148,8 @@ public class NetworkREST : MonoBehaviour
 
         if (allProper)
         {
+            errorHandler = RestError.AllGood;
+
             Debug.Log(result);
             JSONObject j = new JSONObject(result);
             // this won't work everytime
@@ -218,6 +223,7 @@ public class NetworkREST : MonoBehaviour
         if (allProper)
         {
             //Debug.Log(result);
+            errorHandler = RestError.AllGood;
 
             JSONObject root_users = new JSONObject(answer_text);
 
@@ -296,6 +302,7 @@ public class NetworkREST : MonoBehaviour
         if (allProper)
         {
             //Debug.Log(result);
+            errorHandler = RestError.AllGood;
 
             JSONObject root_patients = new JSONObject(answer_text);
 
@@ -381,6 +388,8 @@ public class NetworkREST : MonoBehaviour
             yield return myHttpWebResponse;
             if (allProper)
             {
+                errorHandler = RestError.AllGood;
+
                 Debug.Log(answer_text);
             }
         }
@@ -450,6 +459,8 @@ public class NetworkREST : MonoBehaviour
             yield return myHttpWebResponse;
             if (allProper)
             {
+                errorHandler = RestError.AllGood;
+
                 Debug.Log(answer_text);
                 token = "";
             }
@@ -519,6 +530,8 @@ public class NetworkREST : MonoBehaviour
 
             if (allProper)
             {
+                errorHandler = RestError.AllGood;
+
                 Debug.Log(answer_text);
                 token = "";
             }
@@ -693,14 +706,6 @@ public class NetworkREST : MonoBehaviour
                 allProper = false;
             }
 
-            yield return result;
-
-            if (allProper)
-            {
-                Debug.Log(result);
-                // not really much to do if the exercise has been uploaded properly
-            }
-
         }
         else
         {
@@ -711,6 +716,8 @@ public class NetworkREST : MonoBehaviour
 
         if (allProper)
         {
+            errorHandler = RestError.AllGood;
+
             Debug.Log(result);
         }
 
@@ -876,13 +883,6 @@ public class NetworkREST : MonoBehaviour
                 allProper = false;
             }
 
-            yield return result;
-
-            if (allProper)
-            {
-                //Debug.Log(result);
-            }
-
         }
         else
         {
@@ -893,6 +893,8 @@ public class NetworkREST : MonoBehaviour
 
         if (allProper)
         {
+            errorHandler = RestError.AllGood;
+
             Debug.Log(result);
         }
 
@@ -901,6 +903,147 @@ public class NetworkREST : MonoBehaviour
     //---------------------------------------------------------------------
     //------------------------  TESTING METHODS  --------------------------
     //---------------------------------------------------------------------
+
+    // Use this to do a POST of a physics/ball exercise
+    public IEnumerator POSTPhysicsExercise(string exercisePath)
+    {
+        bool allProper = true;
+        string result = "";
+
+        PhysicsPreferences xmldata = new PhysicsPreferences();
+
+        // let's start with the easy part: they tell me
+        // where the .xml is, I open it and read it
+        string mainFilePath = exercisePath + "\\main.xml";
+        //Debug.Log("The path i search for the xml is " + mainFilePath);
+
+        if (File.Exists(mainFilePath))
+        {
+            xmldata.LoadXML(mainFilePath);
+            //Debug.Log("I actually read it!");
+
+            // since it's really working we can
+            // create the JSON structure to send
+
+            JSONObject nested_fields_lvl1 = new JSONObject(JSONObject.Type.OBJECT);
+
+            nested_fields_lvl1.AddField("patient_id", PhysicsPreferences.patientID);
+            nested_fields_lvl1.AddField("weight", PhysicsPreferences.ball_Weight);
+            nested_fields_lvl1.AddField("elasticity", PhysicsPreferences.ball_Bounciness);
+            nested_fields_lvl1.AddField("start_datetime", PhysicsPreferences.initTime);
+            nested_fields_lvl1.AddField("end_datetime", PhysicsPreferences.endTime);
+
+            // I have to get all the doctors involved
+            // and pick out the first since it is the logged one
+            string list_of_doctors = string.Join(", ", PhysicsPreferences.doctorsIDs.Skip(1).ToArray());
+            nested_fields_lvl1.AddField("other_doctors", "[" + list_of_doctors + "]");
+
+            if (PhysicsPreferences.colorFilterEnabled == true)
+            {
+                JSONObject nested_fields_lvl2CF = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2CF.AddField("a", PhysicsPreferences.colorFilterAlpha.ToString());
+                nested_fields_lvl2CF.AddField("r", PhysicsPreferences.colorFilter.r.ToString());
+                nested_fields_lvl2CF.AddField("g", PhysicsPreferences.colorFilter.g.ToString());
+                nested_fields_lvl2CF.AddField("b", PhysicsPreferences.colorFilter.b.ToString());
+
+                nested_fields_lvl1.AddField("color_filter", nested_fields_lvl2CF);
+            }
+
+            // now the part which is going to be a mess, about the backgrounds
+            if (PhysicsPreferences.backgroundIsImage == false)
+            {
+                JSONObject nested_fields_lvl2BG = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2BG.AddField("a", PhysicsPreferences.backgroundColor.a.ToString());
+                nested_fields_lvl2BG.AddField("r", PhysicsPreferences.backgroundColor.r.ToString());
+                nested_fields_lvl2BG.AddField("g", PhysicsPreferences.backgroundColor.g.ToString());
+                nested_fields_lvl2BG.AddField("b", PhysicsPreferences.backgroundColor.b.ToString());
+
+                nested_fields_lvl1.AddField("background_color", nested_fields_lvl2BG);
+            }
+            else
+            {
+                string fullPath = Path.Combine(exercisePath, Path.GetFileName(PhysicsPreferences.backgroundTexturePath));
+
+                byte[] bytes = File.ReadAllBytes(fullPath);
+
+                string base64String = System.Convert.ToBase64String(bytes);
+                // Debug.Log("codifica dell'immagine: " + base64String);
+
+                JSONObject nested_fields_lvl2BI = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2BI.AddField("filename", PhysicsPreferences.backgroundTexturePath);
+                nested_fields_lvl2BI.AddField("content", base64String);
+                nested_fields_lvl2BI.AddField("content_type", "image/jpeg");
+
+                nested_fields_lvl1.AddField("background_image", nested_fields_lvl2BI);
+            }
+
+            // now the part which is going to be a mess, about the backgrounds
+            JSONObject nested_fields_lvl2Base = new JSONObject(JSONObject.Type.OBJECT);
+            nested_fields_lvl2Base.AddField("a", PhysicsPreferences.ball_Color.a.ToString());
+            nested_fields_lvl2Base.AddField("r", PhysicsPreferences.ball_Color.r.ToString());
+            nested_fields_lvl2Base.AddField("g", PhysicsPreferences.ball_Color.g.ToString());
+            nested_fields_lvl2Base.AddField("b", PhysicsPreferences.ball_Color.b.ToString());
+
+            nested_fields_lvl2Base.AddField("d", PhysicsPreferences.ball_Size);
+
+
+            nested_fields_lvl1.AddField("basic_parameter", nested_fields_lvl2Base);
+
+            // finally, everything goes back into ball
+            JSONObject root_trail = new JSONObject(JSONObject.Type.OBJECT);
+            root_trail.AddField("ball", nested_fields_lvl1);
+
+            string encodedString = root_trail.ToString();
+            Debug.Log(encodedString);
+
+            //the actual call, in a try catch
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+                    client.Headers[HttpRequestHeader.Authorization] = token_string;
+                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    result = client.UploadString(balls_url, "POST", encodedString);
+                }
+            }
+            catch (WebException ex)
+            {
+                Debug.Log("exception: " + ex);
+                var response = ex.Response as HttpWebResponse;
+                errorHandler = RestError.GenericPostBallError;
+
+                if (response != null)
+                {
+                    Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                    switch ((int)response.StatusCode)
+                    {
+                        case 500:
+                            errorHandler = RestError.ServerError;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                allProper = false;
+            }
+        }
+        else
+        {
+            errorHandler = RestError.XMLNotPresent;
+        }
+
+        yield return result;
+
+        if (allProper)
+        {
+            errorHandler = RestError.AllGood;
+
+            Debug.Log(result);
+        }
+
+    }
 
 
 }

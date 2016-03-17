@@ -1,14 +1,13 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <xml>
   <Session>
-    <InitTime>17/03/2016 12:47:15</InitTime>
-    <EndTime>17/03/2016 12:47:22</EndTime>
-    <PatientID>
-    </PatientID>
-    <PatientName>EugenioLonzi</PatientName>
+    <InitTime>11/03/2016 09:54:52</InitTime>
+    <EndTime>11/03/2016 09:55:23</EndTime>
+    <PatientID>4</PatientID>
+    <PatientName>EleonoraBorgogni</PatientName>
     <DoctorsIDs>
-      <DocID>h</DocID>
-      <DocID>D03</DocID>
+      <DocID>bottino_test.com</DocID>
+      <DocID>4</DocID>
     </DoctorsIDs>
   </Session>
   <background>

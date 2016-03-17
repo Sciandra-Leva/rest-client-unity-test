@@ -58,12 +58,6 @@
     <Reference Include="UnityEngine.Networking">
       <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Networking">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
@@ -87,6 +81,7 @@
     <None Include="Assets\Sessions\20160203\AldoBo\PAINT_1140\main.xml" />
     <None Include="Assets\Sessions\20160203\AldoBo\PAINT_1707\main.xml" />
     <None Include="Assets\Sessions\20160203\AldoBo\PHYSICS_1144\main.xml" />
+    <None Include="Assets\Sessions\20160203\AldoBo\PHYSICS_1247\main.xml" />
     <None Include="Assets\Sessions\20160203\AldoBo\PHYSICS_1708\main.xml" />
     <None Include="Assets\Sessions\20160203\AldoBo\TRAILS_1138\main.xml" />
     <None Include="Assets\Sessions\20160203\AldoBo\TRAILS_1710\main.xml" />

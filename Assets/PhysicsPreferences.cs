@@ -1,5 +1,11 @@
 /* File PhysicsPreferences C# implementation of class PhysicsPreferences */
 
+/*	      Computer Graphics and Vision Group	  */
+/*		  Politecnico di Torino			  */
+/*							  */
+/*  THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF POLITO */
+/*  The copyright notice above does not evidence any      */
+/*  actual or intended publication of such source code.   */
 
 
 // global declaration start
@@ -61,7 +67,7 @@ public static bool patientOnly = false;
     	xmlDoc.SelectSingleNode("//xml/physics/patientOnly").InnerText = patientOnly.ToString();
     
     	xmlDoc.Save(xmlCompletePath);
-    	Debug.Log("Saving on XML... DONE!");
+    	if(PIPars.Debug) Debug.Log("Saving on XML... DONE!");
     }
 
 
@@ -99,7 +105,7 @@ public static bool patientOnly = false;
     	string physicsPatientOnly = GetNodeFromXML("xml", "physics", "patientOnly");
     	patientOnly = bool.Parse(physicsPatientOnly);
     
-    	Debug.Log("PhysicsPreferences :: UpdateSettings :: DONE!");
+    	if(PIPars.Debug) Debug.Log("PhysicsPreferences :: UpdateSettings :: DONE!");
     }
 
 

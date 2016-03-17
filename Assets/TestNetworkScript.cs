@@ -81,7 +81,7 @@ public class TestNetworkScript : MonoBehaviour {
             yield return StartCoroutine(client.POSTTrailExercise(path_of_exercise));
             if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
             {
-                Debug.Log("There has been an error: " + client.errorHandler);
+                Debug.Log("There has been an error Trail: " + client.errorHandler);
             }
 
             // the paint POST 
@@ -89,7 +89,15 @@ public class TestNetworkScript : MonoBehaviour {
             yield return StartCoroutine(client.POSTPaintExercise(path_of_exercise));
             if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
             {
-                Debug.Log("There has been an error: " + client.errorHandler);
+                Debug.Log("There has been an error Paint: " + client.errorHandler);
+            }
+
+            // the ball POST 
+            path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\workspace-leva\\rest-client-unity-test\\Assets\\Sessions\\20160203\\AldoBo\\PHYSICS_1247";
+            yield return StartCoroutine(client.POSTPhysicsExercise(path_of_exercise));
+            if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
+            {
+                Debug.Log("There has been an error Ball: " + client.errorHandler);
             }
 
         }
