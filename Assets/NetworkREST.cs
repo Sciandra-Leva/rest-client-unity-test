@@ -3,6 +3,7 @@
 // A small library to handle communication with our RESTful services
 // in the backend server.
 // Developed by: Lorenzo Sciandra
+// v0.6 - now I also POST the various heartbeats files
 // v0.5 - added the Ball POST, and fixed an issue related to the erroHandler to be resetted each call
 //        and some more code polishing
 // v0.4 - added the drawing in Paint, and some fixes. Moreover picture's url should be enough
@@ -856,6 +857,26 @@ public class NetworkREST : MonoBehaviour
                 nested_fields_lvl1.AddField("paint_drawing", nested_fields_lvl2PD);
             }
 
+
+            if (1 == 1)
+            {
+                // I'm reading the heartbeats now
+                string fullPathHB = Path.Combine(exercisePath, "heartRate.dat");
+                Debug.Log("path dove cerca l'HB: " + fullPathHB);
+
+                byte[] bytesHB = File.ReadAllBytes(fullPathHB);
+
+                string base64StringHB = System.Convert.ToBase64String(bytesHB);
+                // Debug.Log("codifica dell'immagine: " + base64String);
+
+                JSONObject nested_fields_lvl2HB = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2HB.AddField("filename", "heartRate.dat");
+                nested_fields_lvl2HB.AddField("content", base64StringHB);
+                nested_fields_lvl2HB.AddField("content_type", "file/dat");
+
+                nested_fields_lvl1.AddField("heartbeat_file", nested_fields_lvl2HB);
+            }
+
             // finally, everything goes back in to trails
             JSONObject root_paint = new JSONObject(JSONObject.Type.OBJECT);
             root_paint.AddField("paint", nested_fields_lvl1);
@@ -1008,6 +1029,26 @@ public class NetworkREST : MonoBehaviour
 
 
             nested_fields_lvl1.AddField("basic_parameter", nested_fields_lvl2Base);
+
+
+            if (1 == 1)
+            {
+                // I'm reading the heartbeats now
+                string fullPathHB = Path.Combine(exercisePath, "heartRate.dat");
+                Debug.Log("path dove cerca l'HB: " + fullPathHB);
+
+                byte[] bytesHB = File.ReadAllBytes(fullPathHB);
+
+                string base64StringHB = System.Convert.ToBase64String(bytesHB);
+                // Debug.Log("codifica dell'immagine: " + base64String);
+
+                JSONObject nested_fields_lvl2HB = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2HB.AddField("filename", "heartRate.dat");
+                nested_fields_lvl2HB.AddField("content", base64StringHB);
+                nested_fields_lvl2HB.AddField("content_type", "file/dat");
+
+                nested_fields_lvl1.AddField("heartbeat_file", nested_fields_lvl2HB);
+            }
 
             // finally, everything goes back into ball
             JSONObject root_trail = new JSONObject(JSONObject.Type.OBJECT);
