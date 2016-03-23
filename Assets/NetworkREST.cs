@@ -59,10 +59,10 @@ public class NetworkREST : MonoBehaviour
     //---------------------------  VARIABLES  -----------------------------
     //---------------------------------------------------------------------
 
-    static string baseURL = "http://ec2-52-58-50-250.eu-central-1.compute.amazonaws.com/";
+    // static string baseURL = "http://ec2-52-58-50-250.eu-central-1.compute.amazonaws.com/";
     // static string baseURL = "http://dev.painteraction.org";
     // static string baseURL = "http://localhost:3000";
-    // static string baseURL = "http://painteraction:3000/";
+    static string baseURL = "http://painteraction:3000/";
 
     static string login_url = baseURL + "/api/v1/sessions";
     static string force_logout_url = baseURL + "/api/v1/force_logout";
@@ -665,6 +665,26 @@ public class NetworkREST : MonoBehaviour
 
                 nested_fields_lvl1.AddField("background_image", nested_fields_lvl2BI);
             }
+
+            if (1 == 1)
+            {
+                // I'm reading the heartbeats now
+                string fullPathHB = Path.Combine(exercisePath, "heartRate.dat");
+                Debug.Log("path dove cerca l'HB: " + fullPathHB);
+
+                byte[] bytesHB = File.ReadAllBytes(fullPathHB);
+
+                string base64StringHB = System.Convert.ToBase64String(bytesHB);
+                // Debug.Log("codifica dell'immagine: " + base64String);
+
+                JSONObject nested_fields_lvl2HB = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2HB.AddField("filename", "heartRate.dat");
+                nested_fields_lvl2HB.AddField("content", base64StringHB);
+                nested_fields_lvl2HB.AddField("content_type", "file/dat");
+
+                nested_fields_lvl1.AddField("heartbeat_file", nested_fields_lvl2HB);
+            }
+
 
             // finally, everything goes back into trail
             JSONObject root_trail = new JSONObject(JSONObject.Type.OBJECT);
