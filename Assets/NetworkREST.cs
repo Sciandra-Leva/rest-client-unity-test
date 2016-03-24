@@ -1,9 +1,10 @@
-﻿//---------------------------------------------------------------------------------------------------
-//-------------------------------------------  NetworkREST  -----------------------------------------
+﻿//-----------------------------------------------------------------------------------------------------
+//-------------------------------------------  NetworkREST  -------------------------------------------
 // A small library to handle communication with our RESTful services
 // in the backend server.
 // Developed by: Lorenzo Sciandra
-// v0.6 - now I also POST the various heartbeats files
+// v0.6 - now I also POST the various heartbeats files, and the Vowel POST. Also a small bugfix.
+//        just remember that the Vowel still need proper implementation since the XML has to be updated
 // v0.5 - added the Ball POST, and fixed an issue related to the erroHandler to be resetted each call
 //        and some more code polishing
 // v0.4 - added the drawing in Paint, and some fixes. Moreover picture's url should be enough
@@ -11,7 +12,7 @@
 // v0.31 - added new url
 // v0.3 - fixed server not online error handling
 // v0.2 - changed JSON library
-//---------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------
 
 
 using UnityEngine;
@@ -43,7 +44,8 @@ public enum RestError
     GenericFinalLogoutError,
     GenericPostTrailError,
     GenericPostPaintError,
-    GenericPostBallError
+    GenericPostBallError,
+    GenericPostVowelError
 }
 
 public enum RestSession
@@ -70,8 +72,7 @@ public class NetworkREST : MonoBehaviour
     static string trails_url = baseURL + "/api/v1/trails";
     static string paints_url = baseURL + "/api/v1/paints";
     static string balls_url = baseURL + "/api/v1/balls";
-    
-    //	static string vowels_url = baseURL + "/api/v1/vowels";
+    static string vowels_url = baseURL + "/api/v1/vowels";
 
     private string token = "";
     private string login_email = "";
@@ -825,7 +826,7 @@ public class NetworkREST : MonoBehaviour
             }
             else
             {
-                string fullPath = Path.Combine(exercisePath, Path.GetFileName(TrailPreferences.backgroundTexturePath));
+                string fullPath = Path.Combine(exercisePath, Path.GetFileName(PaintPreferences.backgroundTexturePath));
 
                 byte[] bytes = File.ReadAllBytes(fullPath);
 
@@ -1106,5 +1107,177 @@ public class NetworkREST : MonoBehaviour
 
     }
 
+    // Use this to do a POST for a paint exercise
+    public IEnumerator POSTVowelExercise(string exercisePath)
+    {
+        bool allProper = true;
+        string result = "";
+
+        VowelsPreferences xmldata = new VowelsPreferences();
+
+        // let's start with the easy part: they tell me
+        // where the .xml is, I open it and read it
+        string mainFilePath = exercisePath + "\\main.xml";
+        //Debug.Log("The path i search for the xml is " + mainFilePath);
+
+        if (File.Exists(mainFilePath))
+        {
+            xmldata.LoadXML(mainFilePath);
+            //Debug.Log("I actually read it!");
+
+            // since it's really working we can
+            // create the JSON structure to send
+
+            JSONObject nested_fields_lvl1 = new JSONObject(JSONObject.Type.OBJECT);
+
+            nested_fields_lvl1.AddField("patient_id", VowelsPreferences.patientID);
+            nested_fields_lvl1.AddField("start_datetime", VowelsPreferences.initTime);
+            nested_fields_lvl1.AddField("end_datetime", VowelsPreferences.endTime);
+            //nested_fields_lvl1.AddField("patient_only", VowelsPreferences.patientOnly.ToString().ToLower());
+
+            // I have to get all the doctors involved
+            // and pick out the first since it is the logged one
+            string list_of_doctors = string.Join(", ", VowelsPreferences.doctorsIDs.Skip(1).ToArray());
+            nested_fields_lvl1.AddField("other_doctors", "[" + list_of_doctors + "]");
+
+            // MISSING FIELDS = specialfx
+            //nested_fields_lvl1.AddField("dimension", "10");
+
+            //count = 0;
+            //foreach (Color single_color in PaintPreferences.paintColor)
+            //{
+            //    JSONObject nested_fields_lvl2C = new JSONObject(JSONObject.Type.OBJECT);
+            //    count += 1;
+            //    nested_fields_lvl2C.AddField("a", single_color.a);
+            //    nested_fields_lvl2C.AddField("r", single_color.r);
+            //    nested_fields_lvl2C.AddField("g", single_color.g);
+            //    nested_fields_lvl2C.AddField("b", single_color.b);
+
+            //    nested_fields_lvl1.AddField("color" + count.ToString(), nested_fields_lvl2C);
+            //}
+
+            if (VowelsPreferences.colorFilterEnabled == true)
+            {
+                JSONObject nested_fields_lvl2CF = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2CF.AddField("a", VowelsPreferences.colorFilterAlpha.ToString());
+                nested_fields_lvl2CF.AddField("r", VowelsPreferences.colorFilter.r.ToString());
+                nested_fields_lvl2CF.AddField("g", VowelsPreferences.colorFilter.g.ToString());
+                nested_fields_lvl2CF.AddField("b", VowelsPreferences.colorFilter.b.ToString());
+
+                nested_fields_lvl1.AddField("color_filter", nested_fields_lvl2CF);
+            }
+
+            // I have to set it here because srly that is fucked up
+            // PaintPreferences.backgroundIsImage = false;
+            // now the part which is going to be a mess, about the backgrounds
+            if (VowelsPreferences.backgroundIsImage == false)
+            {
+                JSONObject nested_fields_lvl2BG = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2BG.AddField("a", VowelsPreferences.backgroundColor.a.ToString());
+                nested_fields_lvl2BG.AddField("r", VowelsPreferences.backgroundColor.r.ToString());
+                nested_fields_lvl2BG.AddField("g", VowelsPreferences.backgroundColor.g.ToString());
+                nested_fields_lvl2BG.AddField("b", VowelsPreferences.backgroundColor.b.ToString());
+
+                nested_fields_lvl1.AddField("background_color", nested_fields_lvl2BG);
+            }
+            else
+            {
+                string fullPath = Path.Combine(exercisePath, Path.GetFileName(VowelsPreferences.backgroundTexturePath));
+
+                byte[] bytes = File.ReadAllBytes(fullPath);
+
+                string base64String = Convert.ToBase64String(bytes);
+                //Debug.Log("codifica dell'immagine: " + base64String);
+
+                JSONObject nested_fields_lvl2BI = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2BI.AddField("filename", VowelsPreferences.backgroundTexturePath);
+                nested_fields_lvl2BI.AddField("content", base64String);
+                nested_fields_lvl2BI.AddField("content_type", "image/jpeg");
+
+                nested_fields_lvl1.AddField("background_image", nested_fields_lvl2BI);
+            }
+
+            if (1 == 1)
+            {
+                // I'm reading the heartbeats now
+                string fullPathHB = Path.Combine(exercisePath, "heartRate.dat");
+                Debug.Log("path dove cerca l'HB: " + fullPathHB);
+
+                byte[] bytesHB = File.ReadAllBytes(fullPathHB);
+
+                string base64StringHB = System.Convert.ToBase64String(bytesHB);
+                // Debug.Log("codifica dell'immagine: " + base64String);
+
+                JSONObject nested_fields_lvl2HB = new JSONObject(JSONObject.Type.OBJECT);
+                nested_fields_lvl2HB.AddField("filename", "heartRate.dat");
+                nested_fields_lvl2HB.AddField("content", base64StringHB);
+                nested_fields_lvl2HB.AddField("content_type", "file/dat");
+
+                nested_fields_lvl1.AddField("heartbeat_file", nested_fields_lvl2HB);
+            }
+
+            // finally, everything goes back in to trails
+            JSONObject root_paint = new JSONObject(JSONObject.Type.OBJECT);
+            root_paint.AddField("paint", nested_fields_lvl1);
+
+            string encodedString = root_paint.ToString();
+            Debug.Log(encodedString);
+
+
+            //the actual call, in a try catch
+            try
+            {
+                using (var client = new WebClient())
+                {
+                    string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+                    client.Headers[HttpRequestHeader.Authorization] = token_string;
+                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    result = client.UploadString(vowels_url, "POST", encodedString);
+                }
+            }
+            catch (WebException ex)
+            {
+                Debug.Log("exception: " + ex);
+                var response = ex.Response as HttpWebResponse;
+                errorHandler = RestError.GenericPostVowelError;
+
+                if (response != null)
+                {
+                    Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                    switch ((int)response.StatusCode)
+                    {
+
+                        //			case 400:
+                        //				errorHandler = RestError.WrongMail;
+                        //				break;
+                        //			case 401:
+                        //				errorHandler = RestError.WrongPassword;
+                        //				break;
+                        case 500:
+                            errorHandler = RestError.ServerError;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                allProper = false;
+            }
+
+        }
+        else
+        {
+            errorHandler = RestError.XMLNotPresent;
+        }
+
+        yield return result;
+
+        if (allProper)
+        {
+            errorHandler = RestError.AllGood;
+
+            Debug.Log(result);
+        }
+
+    }
 
 }
