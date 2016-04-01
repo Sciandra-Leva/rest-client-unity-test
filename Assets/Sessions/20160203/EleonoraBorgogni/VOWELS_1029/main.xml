@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+  <Session>
+    <InitTime>01/04/2016 10:29:08</InitTime>
+    <EndTime>01/04/2016 10:29:21</EndTime>
+    <PatientID>10</PatientID>
+    <PatientName>Renato Piccolomini</PatientName>
+    <DoctorsIDs>
+      <DocID>7</DocID>
+      <DocID>10</DocID>
+    </DoctorsIDs>
+    <PatientIsDexterous>True</PatientIsDexterous>
+  </Session>
+  <background>
+    <bgLayer>
+      <image>northern-lights-christmas-background-1366-768-618491.jpeg</image>
+      <!-- string: file path + name -->
+      <color>#FFFFFFFF</color>
+      <!-- #ffffff or #fff or ffffff or fff -->
+    </bgLayer>
+    <rgbaLayer>
+      <enabled>true</enabled>
+      <!-- bool -->
+      <alpha>0.4928571</alpha>
+      <!-- float -->
+    </rgbaLayer>
+    <filterLayer>
+      <color>#FF79EC43</color>
+      <!-- #ffffff or #fff or ffffff or fff -->
+      <alpha>0.2628572</alpha>
+      <!-- float -->
+    </filterLayer>
+  </background>
+  <vowels>
+    <size>M</size>
+    <lifespan>11.38</lifespan>
+    <specialFX>True</specialFX>
+    <colors>
+      <c01>#2D9600C4</c01>
+      <c02>#CFAB004A</c02>
+      <c03>#FF36E9FF</c03>
+      <c04>#0020EFFF</c04>
+      <c05>#FF5B305A</c05>
+    </colors>
+  </vowels>
+</xml>
