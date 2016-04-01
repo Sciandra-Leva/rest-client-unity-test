@@ -26,11 +26,13 @@ class PhysicsPreferences : BgPreferences
 public static Color ball_Color = Color.yellow;
 public static string ball_Color_text = "Yellow";
 public static int ball_Size = 10;
+public static string ball_Size_Text = "S";
 public static float ball_Weight = 3f;
 public static float ball_Bounciness = 1f;
 
 public static Hashtable ballColors;
-public static List<int> ballSizes;
+//public static List<int> ballSizes;
+public static Dictionary<string, int> ballSizes;
 
 public static bool patientOnly = false;
 // class declaration end
@@ -47,10 +49,10 @@ public static bool patientOnly = false;
        ballColors.Add("Green", Color.green);
        ballColors.Add("Blue", Color.blue);
     
-       ballSizes = new List<int>();
-       ballSizes.Add(10); 
-       ballSizes.Add(20); 
-       ballSizes.Add(30); 
+       ballSizes = new Dictionary<string, int>();
+       ballSizes.Add("S",10); 
+       ballSizes.Add("M",20); 
+       ballSizes.Add("L",30);
     
        UpdateSettings();
     }
@@ -58,10 +60,11 @@ public static bool patientOnly = false;
 
     public override void SaveXML(string filename)
     {
+    	if(PIPars.Debug) Debug.Log("PhysicsPreferences.SaveXML");
     	base.SaveXML(filename);
     
     	xmlDoc.SelectSingleNode("//xml/physics/color").InnerText = ball_Color_text;
-    	xmlDoc.SelectSingleNode("//xml/physics/size").InnerText = ball_Size.ToString();
+    	xmlDoc.SelectSingleNode("//xml/physics/size").InnerText = ball_Size_Text;
     	xmlDoc.SelectSingleNode("//xml/physics/weight").InnerText = ball_Weight.ToString("0.00");
     	xmlDoc.SelectSingleNode("//xml/physics/bounciness").InnerText = ball_Bounciness.ToString("0.00");
     	xmlDoc.SelectSingleNode("//xml/physics/patientOnly").InnerText = patientOnly.ToString();
@@ -85,10 +88,18 @@ public static bool patientOnly = false;
     		ball_Color = Color.red;
     
     	string size = GetNodeFromXML("xml", "physics", "size");
-    	if(!string.IsNullOrEmpty(size) && ballSizes.Contains(int.Parse(size)))
-    		ball_Size = int.Parse(size);
+    	if(!string.IsNullOrEmpty(size) && ballSizes.ContainsKey(size))
+    	{
+    		int val = 0;
+    		ballSizes.TryGetValue(size, out val);
+    		ball_Size = val;
+    		ball_Size_Text = size;
+    	}
     	else
+    	{
     		ball_Size = 10;
+    		ball_Size_Text = "S";
+    	}
     
     	string weight = GetNodeFromXML("xml", "physics", "weight");
     	if(!string.IsNullOrEmpty(weight))

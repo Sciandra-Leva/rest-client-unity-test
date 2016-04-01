@@ -100,6 +100,14 @@ public class TestNetworkScript : MonoBehaviour {
                 Debug.Log("There has been an error Ball: " + client.errorHandler);
             }
 
+            // the vowel POST 
+            //path_of_exercise = "C:\\Users\\Lorenzo\\Documents\\workspace-leva\\rest-client-unity-test\\Assets\\Sessions\\20160203\\AldoBo\\PHYSICS_1247";
+            //yield return StartCoroutine(client.POSTVowelExercise(path_of_exercise));
+            //if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
+            //{
+            //    Debug.Log("There has been an error Vowel: " + client.errorHandler);
+            //}
+
         }
 	}
 

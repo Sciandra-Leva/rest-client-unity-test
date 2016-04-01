@@ -29,7 +29,7 @@ public static bool othersSX_trailsEnabled = true;
 public static float trailsDimension = 5f;
 
 //public static PITrailRenderer.PITrailParticlesRenderer trailsType = PITrailRenderer.PITrailParticlesRenderer.Particles;
-public static string trailsType = "Test type";
+public static string trailsType;
 
 
 public static Color patientDX_trailsColor = Color.red;
@@ -53,75 +53,6 @@ public static string trailsMusic = null;
        // reads its own parts
        UpdateSettings();
     }
-
-
-    /*public override void SaveXML(string filename)
-    {
-    	base.SaveXML(filename);
-    
-    	if(patientDX_trailsEnabled)
-    		xmlDoc.SelectSingleNode("//xml/trails/enabled/patientDX").InnerText = "true";
-    	else
-    		xmlDoc.SelectSingleNode("//xml/trails/enabled/patientDX").InnerText = "false";
-    
-    	if(patientSX_trailsEnabled)
-    		xmlDoc.SelectSingleNode("//xml/trails/enabled/patientSX").InnerText = "true";
-    	else
-    		xmlDoc.SelectSingleNode("//xml/trails/enabled/patientSX").InnerText = "false";
-    
-    	if(othersDX_trailsEnabled)
-    		xmlDoc.SelectSingleNode("//xml/trails/enabled/othersDX").InnerText = "true";
-    	else
-    		xmlDoc.SelectSingleNode("//xml/trails/enabled/othersDX").InnerText = "false";
-    
-    	if(othersSX_trailsEnabled)
-    		xmlDoc.SelectSingleNode("//xml/trails/enabled/othersSX").InnerText = "true";
-    	else
-    		xmlDoc.SelectSingleNode("//xml/trails/enabled/othersSX").InnerText = "false";
-    
-    	xmlDoc.SelectSingleNode("//xml/trails/dimension").InnerText = trailsDimension.ToString("0.00");
-    
-    	switch(trailsType)
-    	{
-    		case PITrailRenderer.PITrailParticlesRenderer.Billboards:
-    			xmlDoc.SelectSingleNode("//xml/trails/type").InnerText = "Billboards";
-    			break;
-    		case PITrailRenderer.PITrailParticlesRenderer.Particles:
-    			xmlDoc.SelectSingleNode("//xml/trails/type").InnerText = "Particles";
-    			break;	
-    		case PITrailRenderer.PITrailParticlesRenderer.Trails:
-    			xmlDoc.SelectSingleNode("//xml/trails/type").InnerText = "Trails";
-    			break;	
-    		case PITrailRenderer.PITrailParticlesRenderer.FashionTrails:
-    			xmlDoc.SelectSingleNode("//xml/trails/type").InnerText = "FashionTrails";
-    			break;	
-    		case PITrailRenderer.PITrailParticlesRenderer.SmoothFashionTrails:
-    			xmlDoc.SelectSingleNode("//xml/trails/type").InnerText = "SmoothFashionTrails";
-    			break;	
-    	}
-    
-    	xmlDoc.SelectSingleNode("//xml/trails/timeToLive").InnerText = trailsTimeToLive.ToString("0.00");
-    
-    	if(trailsSpecialFX)
-    		xmlDoc.SelectSingleNode("//xml/trails/specialFx").InnerText = "true";
-    	else
-    		xmlDoc.SelectSingleNode("//xml/trails/specialFx").InnerText = "false";
-    
-    	xmlDoc.SelectSingleNode("//xml/trails/color/patientDX").InnerText = ConvertColorToHex(patientDX_trailsColor);
-    	xmlDoc.SelectSingleNode("//xml/trails/color/patientSX").InnerText = ConvertColorToHex(patientSX_trailsColor);
-    	xmlDoc.SelectSingleNode("//xml/trails/color/othersDX").InnerText = ConvertColorToHex(othersDX_trailsColor);
-    	xmlDoc.SelectSingleNode("//xml/trails/color/othersSX").InnerText = ConvertColorToHex(othersSX_trailsColor);
-    
-    	xmlDoc.SelectSingleNode("//xml/trails/music").InnerText = trailsMusic;
-    
-    	if( !string.IsNullOrEmpty(filename) )
-    		xmlDoc.Save(filename);
-    	else
-    		xmlDoc.Save(xmlCompletePath);
-    
-    	if(PIPars.Debug) Debug.Log("Saving on XML... DONE! "+xmlCompletePath);
-    }
-    */
 
     public void UpdateSettings()
     {
