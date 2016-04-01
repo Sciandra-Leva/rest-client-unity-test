@@ -58,6 +58,7 @@ public static Texture backgroundTexture = null;
 public static string backgroundTexturePath = null;
 public static Color backgroundColor = Color.green;
 public static bool backgroundIsImage = false;
+public static bool isDexterous = false;
 // class declaration end
 
 
@@ -92,7 +93,7 @@ public static bool backgroundIsImage = false;
     		tmpColor = HexColor.Substring(1);
     	else 
     		tmpColor = HexColor;
-            
+       
     	if( tmpColor.Length == 6 )
     	{
     		R = int.Parse(tmpColor.Substring(0,2), System.Globalization.NumberStyles.AllowHexSpecifier);
@@ -107,7 +108,7 @@ public static bool backgroundIsImage = false;
     		B = int.Parse(tmpColor.Substring(2,1)+tmpColor.Substring(2,1), System.Globalization.NumberStyles.AllowHexSpecifier);
     		convertedColor = new Color ( R/255f, G/255f, B/255f, alpha );
     	}
-    	if( tmpColor.Length == 8 )
+    	else if( tmpColor.Length == 8 )
     	{
     		R = int.Parse(tmpColor.Substring(0,2), System.Globalization.NumberStyles.AllowHexSpecifier);
     		G = int.Parse(tmpColor.Substring(2,2), System.Globalization.NumberStyles.AllowHexSpecifier);
@@ -189,6 +190,9 @@ public static bool backgroundIsImage = false;
     	endTime = GetNodeFromXML("xml", "Session", "EndTime");
     	patientID = GetNodeFromXML("xml", "Session", "PatientID");
     	doctorsIDs = GetNodesFromXML("xml", "Session", "DoctorsIDs").ToList();
+    	
+    	string patientIsDexterous = GetNodeFromXML("xml", "Session", "PatientIsDexterous");
+    	isDexterous = bool.Parse(patientIsDexterous);
     	
     
     ////// Reading BG Layer Settings
@@ -272,7 +276,7 @@ public static bool backgroundIsImage = false;
     		System.IO.File.Copy(xmlCompletePath, xmlCompletePath+".old", true);
     	}
     
-    	if(PIPars.Debug) Debug.Log("Saving on XML... "+xmlCompletePath);
+    	if(PIPars.Debug) Debug.Log("Saving on XML... " + xmlCompletePath);
     
     	//Changing all parameters with new values
     	// SESSION Parameters		
@@ -289,8 +293,9 @@ public static bool backgroundIsImage = false;
     
         		//Add the node to the document.
         		xmlDoc.SelectSingleNode("//xml/Session/DoctorsIDs").AppendChild(elem);
-    		//xmlDoc.SelectSingleNode("//xml/Session/DoctorsID/").InnerText = patientID;
     	}
+    	xmlDoc.SelectSingleNode("//xml/Session/PatientIsDexterous").InnerText = isDexterous.ToString();
+    
     
     	// BG Layer
     	if(backgroundTexturePath != null)

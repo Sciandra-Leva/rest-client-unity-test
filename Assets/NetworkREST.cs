@@ -3,15 +3,16 @@
 // A small library to handle communication with our RESTful services
 // in the backend server.
 // Developed by: Lorenzo Sciandra
-// v0.6 - now I also POST the various heartbeats files, and the Vowel POST. Also a small bugfix.
-//        just remember that the Vowel still need proper implementation since the XML has to be updated
-// v0.5 - added the Ball POST, and fixed an issue related to the erroHandler to be resetted each call
-//        and some more code polishing
-// v0.4 - added the drawing in Paint, and some fixes. Moreover picture's url should be enough
+// v0.61 - added the corret Vowel implementation
+// v0.6  - now I also POST the various heartbeats files, and the Vowel POST. Also a small bugfix.
+//         just remember that the Vowel still need proper implementation since the XML has to be updated
+// v0.5  - added the Ball POST, and fixed an issue related to the erroHandler to be resetted each call
+//         and some more code polishing
+// v0.4  - added the drawing in Paint, and some fixes. Moreover picture's url should be enough
 // v0.32 - fixed path of background image and added a complete name field
 // v0.31 - added new url
-// v0.3 - fixed server not online error handling
-// v0.2 - changed JSON library
+// v0.3  - fixed server not online error handling
+// v0.2  - changed JSON library
 //-----------------------------------------------------------------------------------------------------
 
 
@@ -1133,28 +1134,48 @@ public class NetworkREST : MonoBehaviour
             nested_fields_lvl1.AddField("patient_id", VowelsPreferences.patientID);
             nested_fields_lvl1.AddField("start_datetime", VowelsPreferences.initTime);
             nested_fields_lvl1.AddField("end_datetime", VowelsPreferences.endTime);
-            //nested_fields_lvl1.AddField("patient_only", VowelsPreferences.patientOnly.ToString().ToLower());
 
             // I have to get all the doctors involved
             // and pick out the first since it is the logged one
             string list_of_doctors = string.Join(", ", VowelsPreferences.doctorsIDs.Skip(1).ToArray());
             nested_fields_lvl1.AddField("other_doctors", "[" + list_of_doctors + "]");
 
-            // MISSING FIELDS = specialfx
-            //nested_fields_lvl1.AddField("dimension", "10");
+            nested_fields_lvl1.AddField("dimension", VowelsPreferences.vowels_Size);
+            nested_fields_lvl1.AddField("time_to_live", VowelsPreferences.lifespan);
+            nested_fields_lvl1.AddField("specialfx", VowelsPreferences.vowelsSpecialFX);
 
-            //count = 0;
-            //foreach (Color single_color in PaintPreferences.paintColor)
-            //{
-            //    JSONObject nested_fields_lvl2C = new JSONObject(JSONObject.Type.OBJECT);
-            //    count += 1;
-            //    nested_fields_lvl2C.AddField("a", single_color.a);
-            //    nested_fields_lvl2C.AddField("r", single_color.r);
-            //    nested_fields_lvl2C.AddField("g", single_color.g);
-            //    nested_fields_lvl2C.AddField("b", single_color.b);
+            int count = 0;
+            foreach (Color single_color in VowelsPreferences.vowelsColors)
+            {
+                JSONObject nested_fields_lvl2C = new JSONObject(JSONObject.Type.OBJECT);
+                count += 1;
+                nested_fields_lvl2C.AddField("a", single_color.a);
+                nested_fields_lvl2C.AddField("r", single_color.r);
+                nested_fields_lvl2C.AddField("g", single_color.g);
+                nested_fields_lvl2C.AddField("b", single_color.b);
 
-            //    nested_fields_lvl1.AddField("color" + count.ToString(), nested_fields_lvl2C);
-            //}
+                switch (count)
+                {
+                    case 1:
+                        nested_fields_lvl1.AddField("colorA" + count.ToString(), nested_fields_lvl2C);
+                        break;
+                    case 2:
+                        nested_fields_lvl1.AddField("colorE" + count.ToString(), nested_fields_lvl2C);
+                        break;
+                    case 3:
+                        nested_fields_lvl1.AddField("colorI" + count.ToString(), nested_fields_lvl2C);
+                        break;
+                    case 4:
+                        nested_fields_lvl1.AddField("colorO" + count.ToString(), nested_fields_lvl2C);
+                        break;
+                    case 5:
+                        nested_fields_lvl1.AddField("colorU" + count.ToString(), nested_fields_lvl2C);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
 
             if (VowelsPreferences.colorFilterEnabled == true)
             {
