@@ -10,6 +10,7 @@
       <DocID>9</DocID>
       <DocID>10</DocID>
     </DoctorsIDs>
+    <PatientIsDexterous>True</PatientIsDexterous>
   </Session>
   <background>
     <bgLayer>

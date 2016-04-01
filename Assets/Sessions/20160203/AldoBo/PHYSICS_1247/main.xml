@@ -9,6 +9,7 @@
       <DocID>bottino_test.com</DocID>
       <DocID>4</DocID>
     </DoctorsIDs>
+    <PatientIsDexterous>True</PatientIsDexterous>
   </Session>
   <background>
     <bgLayer>

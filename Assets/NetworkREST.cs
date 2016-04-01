@@ -1142,7 +1142,7 @@ public class NetworkREST : MonoBehaviour
 
             nested_fields_lvl1.AddField("dimension", VowelsPreferences.vowels_Size);
             nested_fields_lvl1.AddField("time_to_live", VowelsPreferences.lifespan);
-            nested_fields_lvl1.AddField("specialfx", VowelsPreferences.vowelsSpecialFX);
+            nested_fields_lvl1.AddField("special_fx", VowelsPreferences.vowelsSpecialFX);
 
             int count = 0;
             foreach (Color single_color in VowelsPreferences.vowelsColors)
@@ -1157,19 +1157,19 @@ public class NetworkREST : MonoBehaviour
                 switch (count)
                 {
                     case 1:
-                        nested_fields_lvl1.AddField("colorA" + count.ToString(), nested_fields_lvl2C);
+                        nested_fields_lvl1.AddField("colorA", nested_fields_lvl2C);
                         break;
                     case 2:
-                        nested_fields_lvl1.AddField("colorE" + count.ToString(), nested_fields_lvl2C);
+                        nested_fields_lvl1.AddField("colorE", nested_fields_lvl2C);
                         break;
                     case 3:
-                        nested_fields_lvl1.AddField("colorI" + count.ToString(), nested_fields_lvl2C);
+                        nested_fields_lvl1.AddField("colorI", nested_fields_lvl2C);
                         break;
                     case 4:
-                        nested_fields_lvl1.AddField("colorO" + count.ToString(), nested_fields_lvl2C);
+                        nested_fields_lvl1.AddField("colorO", nested_fields_lvl2C);
                         break;
                     case 5:
-                        nested_fields_lvl1.AddField("colorU" + count.ToString(), nested_fields_lvl2C);
+                        nested_fields_lvl1.AddField("colorU", nested_fields_lvl2C);
                         break;
                     default:
                         break;
@@ -1239,7 +1239,7 @@ public class NetworkREST : MonoBehaviour
 
             // finally, everything goes back in to trails
             JSONObject root_paint = new JSONObject(JSONObject.Type.OBJECT);
-            root_paint.AddField("paint", nested_fields_lvl1);
+            root_paint.AddField("vowel", nested_fields_lvl1);
 
             string encodedString = root_paint.ToString();
             Debug.Log(encodedString);

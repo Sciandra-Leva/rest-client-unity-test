@@ -79,6 +79,7 @@
   <ItemGroup>
     <None Include="Assets\JSON\readme.txt" />
     <None Include="Assets\Sessions\20160203\AldoBo\PHYSICS_1247\main.xml" />
+    <None Include="Assets\Sessions\20160203\EleonoraBorgogni\VOWELS_1029\main.xml" />
     <None Include="Assets\Sessions\20160203\OlivieroManzari\PAINT_0939\main.xml" />
     <None Include="Assets\Sessions\20160203\OlivieroManzari\TRAILS_0939\main.xml" />
   </ItemGroup>
