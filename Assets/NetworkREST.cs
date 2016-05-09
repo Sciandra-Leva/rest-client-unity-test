@@ -3,6 +3,7 @@
 // A small library to handle communication with our RESTful services
 // in the backend server.
 // Developed by: Lorenzo Sciandra
+// v0.7  - modified in order to have retries for each call
 // v0.61 - added the corret Vowel implementation
 // v0.6  - now I also POST the various heartbeats files, and the Vowel POST. Also a small bugfix.
 //         just remember that the Vowel still need proper implementation since the XML has to be updated
@@ -63,7 +64,7 @@ public class NetworkREST : MonoBehaviour
     //---------------------------  VARIABLES  -----------------------------
     //---------------------------------------------------------------------
 
-    static string baseURL = "http://ec2-52-58-50-250.eu-central-1.compute.amazonaws.com/";
+    static string baseURL = "https://painteractions-staging.leva-services.me/";
     // static string baseURL = "http://dev.painteraction.org";
     // static string baseURL = "http://localhost:3000";
     // static string baseURL = "http://painteraction:3000/";
@@ -74,6 +75,8 @@ public class NetworkREST : MonoBehaviour
     static string paints_url = baseURL + "/api/v1/paints";
     static string balls_url = baseURL + "/api/v1/balls";
     static string vowels_url = baseURL + "/api/v1/vowels";
+
+    static int NumberOfRetries = 3;
 
     private string token = "";
     private string login_email = "";
@@ -88,12 +91,11 @@ public class NetworkREST : MonoBehaviour
     //-------------------------  PUBLIC METHODS  --------------------------
     //---------------------------------------------------------------------
 
-    // TO DO: a check connection method, in order to not screw up later
-
     // Use this to do a POST and create a session
     public IEnumerator LOGINUser(string email, string password)
     {
-        bool allProper = true;
+        bool allProper = false;
+        int retryCount = NumberOfRetries;
 
         // I need to store those informations for other calls
         login_email = email;
@@ -109,42 +111,50 @@ public class NetworkREST : MonoBehaviour
 
         string result = "";
 
-        // the actual call, in a try catch
-        try
+        while (!allProper && retryCount > 0)
         {
-            using (var client = new WebClient())
+            // the actual call, in a try catch
+            try
             {
-                client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                result = client.UploadString(login_url, "POST", encodedString);
-            }
-        }
-        catch (WebException ex)
-        {
-            Debug.Log("TESTexception: " + ex);
-            var response = ex.Response as HttpWebResponse;
-            errorHandler = RestError.GenericLoginError;
-
-            if (response != null)
-            {
-                Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                switch ((int)response.StatusCode)
+                using (var client = new WebClient())
                 {
+                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    result = client.UploadString(login_url, "POST", encodedString);
+                }
+                allProper = true;
+            }
+            catch (WebException ex)
+            {
+                retryCount--;
 
-                    case 400:
-                        errorHandler = RestError.WrongMail;
+                if (retryCount == 0)
+                {
+                    Debug.Log("TESTexception: " + ex);
+                    var response = ex.Response as HttpWebResponse;
+                    errorHandler = RestError.GenericLoginError;
+
+                    if (response != null)
+                    {
+                        Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                        switch ((int)response.StatusCode)
+                        {
+
+                            case 400:
+                                errorHandler = RestError.WrongMail;
+                                break;
+                            case 401:
+                                errorHandler = RestError.WrongPassword;
+                                break;
+                            case 500:
+                                errorHandler = RestError.ServerError;
+                                break;
+                            default:
+                                break;
+                        }
                         break;
-                    case 401:
-                        errorHandler = RestError.WrongPassword;
-                        break;
-                    case 500:
-                        errorHandler = RestError.ServerError;
-                        break;
-                    default:
-                        break;
+                    }
                 }
             }
-
-            allProper = false;
         }
 
         yield return result;
@@ -174,51 +184,60 @@ public class NetworkREST : MonoBehaviour
     // Use this to GET the list of users
     public IEnumerator GETUsersList(List<Person> listOfDoctors)
     {
-        bool allProper = true;
+        bool allProper = false;
+        int retryCount = NumberOfRetries;
 
         string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
         string result = "";
         string answer_text = string.Empty;
 
-        try
+        while (!allProper && retryCount > 0)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(baseURL + "/api/v1/users");
-            request.Method = "GET";
-            request.Headers[HttpRequestHeader.Authorization] = token_string;
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+            try
             {
-                Stream dataStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(dataStream);
-                answer_text = reader.ReadToEnd();
-                reader.Close();
-                dataStream.Close();
-            }
-        }
-        catch (WebException ex)
-        {
-            Debug.Log("exception: " + ex);
-            var response = ex.Response as HttpWebResponse;
-            errorHandler = RestError.GenericGetUserListError;
-
-            if (response != null)
-            {
-                Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                switch ((int)response.StatusCode)
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(baseURL + "/api/v1/users");
+                request.Method = "GET";
+                request.Headers[HttpRequestHeader.Authorization] = token_string;
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 {
+                    Stream dataStream = response.GetResponseStream();
+                    StreamReader reader = new StreamReader(dataStream);
+                    answer_text = reader.ReadToEnd();
+                    reader.Close();
+                    dataStream.Close();
+                }
+                allProper = true;
+            }
+            catch (WebException ex)
+            {
+                retryCount--;
 
-                    case 401:
-                        errorHandler = RestError.ZeroDoctors;
+                if (retryCount == 0)
+                {
+                    Debug.Log("exception: " + ex);
+                    var response = ex.Response as HttpWebResponse;
+                    errorHandler = RestError.GenericGetUserListError;
+
+                    if (response != null)
+                    {
+                        Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                        switch ((int)response.StatusCode)
+                        {
+
+                            case 401:
+                                errorHandler = RestError.ZeroDoctors;
+                                break;
+                            case 500:
+                                errorHandler = RestError.ServerError;
+                                break;
+                            default:
+                                break;
+                        }
                         break;
-                    case 500:
-                        errorHandler = RestError.ServerError;
-                        break;
-                    default:
-                        break;
+                    }
                 }
             }
-
-            allProper = false;
         }
 
         yield return result;
@@ -252,52 +271,60 @@ public class NetworkREST : MonoBehaviour
     // Use this to GET the list of patients
     public IEnumerator GETPatientsList(List<Person> listOfPatients)
     {
-
-        bool allProper = true;
+        bool allProper = false;
+        int retryCount = NumberOfRetries;
 
         string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
         string result = "";
         string answer_text = string.Empty;
 
-        try
+        while (!allProper && retryCount > 0)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(baseURL + "/api/v1/patients");
-            request.Method = "GET";
-            request.Headers[HttpRequestHeader.Authorization] = token_string;
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+            try
             {
-                Stream dataStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(dataStream);
-                answer_text = reader.ReadToEnd();
-                reader.Close();
-                dataStream.Close();
-            }
-        }
-        catch (WebException ex)
-        {
-            Debug.Log("exception: " + ex);
-            var response = ex.Response as HttpWebResponse;
-            errorHandler = RestError.GenericGetPatientListError;
-
-            if (response != null)
-            {
-                Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                switch ((int)response.StatusCode)
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(baseURL + "/api/v1/patients");
+                request.Method = "GET";
+                request.Headers[HttpRequestHeader.Authorization] = token_string;
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 {
+                    Stream dataStream = response.GetResponseStream();
+                    StreamReader reader = new StreamReader(dataStream);
+                    answer_text = reader.ReadToEnd();
+                    reader.Close();
+                    dataStream.Close();
+                }
+                allProper = true;
+            }
+            catch (WebException ex)
+            {
+                retryCount--;
 
-                    case 401:
-                        errorHandler = RestError.ZeroPatients;
-                        break;
-                    case 500:
-                        errorHandler = RestError.ServerError;
-                        break;
-                    default:
-                        break;
+                if (retryCount == 0)
+                {
+                    Debug.Log("exception: " + ex);
+                    var response = ex.Response as HttpWebResponse;
+                    errorHandler = RestError.GenericGetPatientListError;
+
+                    if (response != null)
+                    {
+                        Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                        switch ((int)response.StatusCode)
+                        {
+
+                            case 401:
+                                errorHandler = RestError.ZeroPatients;
+                                break;
+                            case 500:
+                                errorHandler = RestError.ServerError;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    break;
                 }
             }
-
-            allProper = false;
         }
 
         yield return result;
@@ -331,62 +358,78 @@ public class NetworkREST : MonoBehaviour
     // Use this to DELETE and do a logout
     public IEnumerator LOGOUTUser()
     {
+
         if (token.Equals(""))
         {
             errorHandler = RestError.NotLoggedIn;
         }
         else
         {
-            bool allProper = true;
+            bool allProper = false;
+            int retryCount = NumberOfRetries;
 
             string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
             string answer_text = string.Empty;
 
             HttpWebResponse myHttpWebResponse = null;
-            try
+
+            while (!allProper && retryCount > 0)
             {
-                HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(login_url);
-
-                myHttpWebRequest.Method = "DELETE";
-                myHttpWebRequest.Headers.Add("Authorization", token_string);
-                // Sends the HttpWebRequest and waits for the response.
-                myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-                // Gets the stream associated with the response.
-                Stream receiveStream = myHttpWebResponse.GetResponseStream();
-                Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-                // Pipes the stream to a higher level stream reader with the required encoding format.
-                StreamReader readStream = new StreamReader(receiveStream, encode);
-                answer_text = readStream.ReadToEnd();
-
-                // Releases the resources of the response.
-                myHttpWebResponse.Close();
-                // Releases the resources of the Stream.
-                readStream.Close();
-            }
-            catch (WebException ex)
-            {
-                Debug.Log("exception: " + ex);
-                var response = ex.Response as HttpWebResponse;
-                errorHandler = RestError.GenericLogoutError;
-
-                if (response != null)
+                try
                 {
-                    Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                    switch ((int)response.StatusCode)
+                    HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(login_url);
+
+                    myHttpWebRequest.Method = "DELETE";
+                    myHttpWebRequest.Headers.Add("Authorization", token_string);
+                    // Sends the HttpWebRequest and waits for the response.
+                    myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
+                    // Gets the stream associated with the response.
+                    Stream receiveStream = myHttpWebResponse.GetResponseStream();
+                    Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+                    // Pipes the stream to a higher level stream reader with the required encoding format.
+                    StreamReader readStream = new StreamReader(receiveStream, encode);
+                    answer_text = readStream.ReadToEnd();
+
+                    // Releases the resources of the response.
+                    myHttpWebResponse.Close();
+                    // Releases the resources of the Stream.
+                    readStream.Close();
+
+                    allProper = true;
+                }
+                catch (WebException ex)
+                {
+                    retryCount--;
+
+                    if (retryCount == 0)
                     {
-                        case 401:
-                            errorHandler = RestError.UnAuthorized;
-                            break;
-                        case 500:
-                            errorHandler = RestError.ServerError;
-                            break;
-                        default:
-                            break;
+                        Debug.Log("exception: " + ex);
+                        var response = ex.Response as HttpWebResponse;
+                        errorHandler = RestError.GenericLogoutError;
+
+                        if (response != null)
+                        {
+                            Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                            switch ((int)response.StatusCode)
+                            {
+                                case 401:
+                                    errorHandler = RestError.UnAuthorized;
+                                    break;
+                                case 500:
+                                    errorHandler = RestError.ServerError;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        break;
                     }
                 }
-                allProper = false;
+
             }
+
+            
 
             yield return myHttpWebResponse;
             if (allProper)
@@ -407,56 +450,68 @@ public class NetworkREST : MonoBehaviour
         }
         else
         {
-            bool allProper = true;
+            bool allProper = false;
+            int retryCount = NumberOfRetries;
+
             string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
             string answer_text = string.Empty;
 
             HttpWebResponse myHttpWebResponse = null;
-            try
+
+            while (!allProper && retryCount > 0)
             {
-                HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(force_logout_url);
-
-                myHttpWebRequest.Method = "DELETE";
-                myHttpWebRequest.Headers.Add("Authorization", token_string);
-                // Sends the HttpWebRequest and waits for the response.
-                myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-                // Gets the stream associated with the response.
-                Stream receiveStream = myHttpWebResponse.GetResponseStream();
-                Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-                // Pipes the stream to a higher level stream reader with the required encoding format.
-                StreamReader readStream = new StreamReader(receiveStream, encode);
-                answer_text = readStream.ReadToEnd();
-
-                // Releases the resources of the response.
-                myHttpWebResponse.Close();
-                // Releases the resources of the Stream.
-                readStream.Close();
-            }
-            catch (WebException ex)
-            {
-                Debug.Log("exception: " + ex);
-                var response = ex.Response as HttpWebResponse;
-                errorHandler = RestError.GenericForceLogoutError;
-
-                if (response != null)
+                try
                 {
-                    Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                    switch ((int)response.StatusCode)
+                    HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(force_logout_url);
+
+                    myHttpWebRequest.Method = "DELETE";
+                    myHttpWebRequest.Headers.Add("Authorization", token_string);
+                    // Sends the HttpWebRequest and waits for the response.
+                    myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
+                    // Gets the stream associated with the response.
+                    Stream receiveStream = myHttpWebResponse.GetResponseStream();
+                    Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+                    // Pipes the stream to a higher level stream reader with the required encoding format.
+                    StreamReader readStream = new StreamReader(receiveStream, encode);
+                    answer_text = readStream.ReadToEnd();
+
+                    // Releases the resources of the response.
+                    myHttpWebResponse.Close();
+                    // Releases the resources of the Stream.
+                    readStream.Close();
+
+                    allProper = true;
+                }
+                catch (WebException ex)
+                {
+                    retryCount--;
+
+                    if (retryCount == 0)
                     {
-                        case 401:
-                            errorHandler = RestError.UnAuthorized;
-                            break;
-                        case 500:
-                            errorHandler = RestError.ServerError;
-                            break;
-                        default:
-                            break;
+                        Debug.Log("exception: " + ex);
+                        var response = ex.Response as HttpWebResponse;
+                        errorHandler = RestError.GenericForceLogoutError;
+
+                        if (response != null)
+                        {
+                            Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                            switch ((int)response.StatusCode)
+                            {
+                                case 401:
+                                    errorHandler = RestError.UnAuthorized;
+                                    break;
+                                case 500:
+                                    errorHandler = RestError.ServerError;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
+                        break;
                     }
                 }
-
-                allProper = false;
-
             }
 
             yield return myHttpWebResponse;
@@ -479,57 +534,71 @@ public class NetworkREST : MonoBehaviour
         }
         else
         {
-            bool allProper = true;
+            bool allProper = false;
+            int retryCount = NumberOfRetries;
 
             string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
 
             string answer_text = string.Empty;
 
             HttpWebResponse myHttpWebResponse = null;
-            try
+
+            while (!allProper && retryCount > 0)
             {
-                HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(login_url);
-
-                myHttpWebRequest.Method = "DELETE";
-                myHttpWebRequest.Headers.Add("Authorization", token_string);
-                // Sends the HttpWebRequest and waits for the response.
-                myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-                // Gets the stream associated with the response.
-                Stream receiveStream = myHttpWebResponse.GetResponseStream();
-                Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-                // Pipes the stream to a higher level stream reader with the required encoding format.
-                StreamReader readStream = new StreamReader(receiveStream, encode);
-                answer_text = readStream.ReadToEnd();
-
-                // Releases the resources of the response.
-                myHttpWebResponse.Close();
-                // Releases the resources of the Stream.
-                readStream.Close();
-            }
-            catch (WebException ex)
-            {
-                Debug.Log("exception: " + ex);
-                var response = ex.Response as HttpWebResponse;
-                errorHandler = RestError.GenericFinalLogoutError;
-
-                if (response != null)
+                try
                 {
-                    Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                    switch ((int)response.StatusCode)
+                    HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(login_url);
+
+                    myHttpWebRequest.Method = "DELETE";
+                    myHttpWebRequest.Headers.Add("Authorization", token_string);
+                    // Sends the HttpWebRequest and waits for the response.
+                    myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
+                    // Gets the stream associated with the response.
+                    Stream receiveStream = myHttpWebResponse.GetResponseStream();
+                    Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+                    // Pipes the stream to a higher level stream reader with the required encoding format.
+                    StreamReader readStream = new StreamReader(receiveStream, encode);
+                    answer_text = readStream.ReadToEnd();
+
+                    // Releases the resources of the response.
+                    myHttpWebResponse.Close();
+                    // Releases the resources of the Stream.
+                    readStream.Close();
+
+                    allProper = true;
+                }
+                catch (WebException ex)
+                {
+                    retryCount--;
+
+                    if (retryCount == 0)
                     {
-                        case 401:
-                            errorHandler = RestError.UnAuthorized;
-                            break;
-                        case 500:
-                            errorHandler = RestError.ServerError;
-                            break;
-                        default:
-                            break;
+                        Debug.Log("exception: " + ex);
+                        var response = ex.Response as HttpWebResponse;
+                        errorHandler = RestError.GenericFinalLogoutError;
+
+                        if (response != null)
+                        {
+                            Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                            switch ((int)response.StatusCode)
+                            {
+                                case 401:
+                                    errorHandler = RestError.UnAuthorized;
+                                    break;
+                                case 500:
+                                    errorHandler = RestError.ServerError;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
+                        break;
                     }
                 }
-
-                allProper = false;
             }
+
+            
 
             if (allProper)
             {
@@ -545,7 +614,8 @@ public class NetworkREST : MonoBehaviour
     // Use this to do a POST of a trails exercise
     public IEnumerator POSTTrailExercise(string exercisePath)
     {
-        bool allProper = true;
+        bool allProper = false;
+        int retryCount = NumberOfRetries;
         string result = "";
 
         TrailPreferences xmldata = new TrailPreferences();
@@ -696,37 +766,46 @@ public class NetworkREST : MonoBehaviour
             string encodedString = root_trail.ToString();
             Debug.Log(encodedString);
 
-            //the actual call, in a try catch
-            try
+            while (!allProper && retryCount > 0)
             {
-                using (var client = new WebClient())
+                //the actual call, in a try catch
+                try
                 {
-                    string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
-                    client.Headers[HttpRequestHeader.Authorization] = token_string;
-                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    result = client.UploadString(trails_url, "POST", encodedString);
-                }
-            }
-            catch (WebException ex)
-            {
-                Debug.Log("exception: " + ex);
-                var response = ex.Response as HttpWebResponse;
-                errorHandler = RestError.GenericPostTrailError;
-
-                if (response != null)
-                {
-                    Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                    switch ((int)response.StatusCode)
+                    using (var client = new WebClient())
                     {
-                        case 500:
-                            errorHandler = RestError.ServerError;
-                            break;
-                        default:
-                            break;
+                        string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+                        client.Headers[HttpRequestHeader.Authorization] = token_string;
+                        client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                        result = client.UploadString(trails_url, "POST", encodedString);
+                    }
+                    allProper = true;
+                }
+                catch (WebException ex)
+                {
+                    retryCount--;
+
+                    if (retryCount == 0)
+                    {
+                        Debug.Log("exception: " + ex);
+                        var response = ex.Response as HttpWebResponse;
+                        errorHandler = RestError.GenericPostTrailError;
+
+                        if (response != null)
+                        {
+                            Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                            switch ((int)response.StatusCode)
+                            {
+                                case 500:
+                                    errorHandler = RestError.ServerError;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
+                        break;
                     }
                 }
-
-                allProper = false;
             }
 
         }
@@ -749,7 +828,9 @@ public class NetworkREST : MonoBehaviour
     // Use this to do a POST for a paint exercise
     public IEnumerator POSTPaintExercise(string exercisePath)
     {
-        bool allProper = true;
+        bool allProper = false;
+        int retryCount = NumberOfRetries;
+
         string result = "";
 
         PaintPreferences xmldata = new PaintPreferences();
@@ -886,46 +967,53 @@ public class NetworkREST : MonoBehaviour
             string encodedString = root_paint.ToString();
             Debug.Log(encodedString);
 
-
-            //the actual call, in a try catch
-            try
+            while (!allProper && retryCount > 0)
             {
-                using (var client = new WebClient())
+                //the actual call, in a try catch
+                try
                 {
-                    string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
-                    client.Headers[HttpRequestHeader.Authorization] = token_string;
-                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    result = client.UploadString(paints_url, "POST", encodedString);
-                }
-            }
-            catch (WebException ex)
-            {
-                Debug.Log("exception: " + ex);
-                var response = ex.Response as HttpWebResponse;
-                errorHandler = RestError.GenericPostPaintError;
-
-                if (response != null)
-                {
-                    Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                    switch ((int)response.StatusCode)
+                    using (var client = new WebClient())
                     {
+                        string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+                        client.Headers[HttpRequestHeader.Authorization] = token_string;
+                        client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                        result = client.UploadString(paints_url, "POST", encodedString);
+                    }
+                    allProper = true;
+                }
+                catch (WebException ex)
+                {
+                    retryCount--;
 
-                        //			case 400:
-                        //				errorHandler = RestError.WrongMail;
-                        //				break;
-                        //			case 401:
-                        //				errorHandler = RestError.WrongPassword;
-                        //				break;
-                        case 500:
-                            errorHandler = RestError.ServerError;
-                            break;
-                        default:
-                            break;
+                    if (retryCount == 0)
+                    {
+                        Debug.Log("exception: " + ex);
+                        var response = ex.Response as HttpWebResponse;
+                        errorHandler = RestError.GenericPostPaintError;
+
+                        if (response != null)
+                        {
+                            Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                            switch ((int)response.StatusCode)
+                            {
+
+                                //			case 400:
+                                //				errorHandler = RestError.WrongMail;
+                                //				break;
+                                //			case 401:
+                                //				errorHandler = RestError.WrongPassword;
+                                //				break;
+                                case 500:
+                                    errorHandler = RestError.ServerError;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        break;
                     }
                 }
-                allProper = false;
             }
-
         }
         else
         {
@@ -950,7 +1038,8 @@ public class NetworkREST : MonoBehaviour
     // Use this to do a POST of a physics/ball exercise
     public IEnumerator POSTPhysicsExercise(string exercisePath)
     {
-        bool allProper = true;
+        bool allProper = false;
+        int retryCount = NumberOfRetries;
         string result = "";
 
         PhysicsPreferences xmldata = new PhysicsPreferences();
@@ -1059,38 +1148,48 @@ public class NetworkREST : MonoBehaviour
             string encodedString = root_trail.ToString();
             Debug.Log(encodedString);
 
-            //the actual call, in a try catch
-            try
+            while (!allProper && retryCount > 0)
             {
-                using (var client = new WebClient())
+                //the actual call, in a try catch
+                try
                 {
-                    string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
-                    client.Headers[HttpRequestHeader.Authorization] = token_string;
-                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    result = client.UploadString(balls_url, "POST", encodedString);
-                }
-            }
-            catch (WebException ex)
-            {
-                Debug.Log("exception: " + ex);
-                var response = ex.Response as HttpWebResponse;
-                errorHandler = RestError.GenericPostBallError;
-
-                if (response != null)
-                {
-                    Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                    switch ((int)response.StatusCode)
+                    using (var client = new WebClient())
                     {
-                        case 500:
-                            errorHandler = RestError.ServerError;
-                            break;
-                        default:
-                            break;
+                        string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+                        client.Headers[HttpRequestHeader.Authorization] = token_string;
+                        client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                        result = client.UploadString(balls_url, "POST", encodedString);
+                    }
+                    allProper = true;
+                }
+                catch (WebException ex)
+                {
+                    retryCount--;
+
+                    if (retryCount == 0)
+                    {
+                        Debug.Log("exception: " + ex);
+                        var response = ex.Response as HttpWebResponse;
+                        errorHandler = RestError.GenericPostBallError;
+
+                        if (response != null)
+                        {
+                            Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                            switch ((int)response.StatusCode)
+                            {
+                                case 500:
+                                    errorHandler = RestError.ServerError;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
+                        break;
                     }
                 }
-
-                allProper = false;
             }
+            
         }
         else
         {
@@ -1111,7 +1210,8 @@ public class NetworkREST : MonoBehaviour
     // Use this to do a POST for a paint exercise
     public IEnumerator POSTVowelExercise(string exercisePath)
     {
-        bool allProper = true;
+        bool allProper = false;
+        int retryCount = NumberOfRetries;
         string result = "";
 
         VowelsPreferences xmldata = new VowelsPreferences();
@@ -1244,46 +1344,54 @@ public class NetworkREST : MonoBehaviour
             string encodedString = root_paint.ToString();
             Debug.Log(encodedString);
 
-
-            //the actual call, in a try catch
-            try
+            while (!allProper && retryCount > 0)
             {
-                using (var client = new WebClient())
+                //the actual call, in a try catch
+                try
                 {
-                    string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
-                    client.Headers[HttpRequestHeader.Authorization] = token_string;
-                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    result = client.UploadString(vowels_url, "POST", encodedString);
-                }
-            }
-            catch (WebException ex)
-            {
-                Debug.Log("exception: " + ex);
-                var response = ex.Response as HttpWebResponse;
-                errorHandler = RestError.GenericPostVowelError;
-
-                if (response != null)
-                {
-                    Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
-                    switch ((int)response.StatusCode)
+                    using (var client = new WebClient())
                     {
+                        string token_string = "Token token=\"" + token + "\", email=\"" + login_email + "\"";
+                        client.Headers[HttpRequestHeader.Authorization] = token_string;
+                        client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                        result = client.UploadString(vowels_url, "POST", encodedString);
+                    }
+                    allProper = true;
+                }
+                catch (WebException ex)
+                {
+                    retryCount--;
 
-                        //			case 400:
-                        //				errorHandler = RestError.WrongMail;
-                        //				break;
-                        //			case 401:
-                        //				errorHandler = RestError.WrongPassword;
-                        //				break;
-                        case 500:
-                            errorHandler = RestError.ServerError;
-                            break;
-                        default:
-                            break;
+                    if (retryCount == 0)
+                    {
+                        Debug.Log("exception: " + ex);
+                        var response = ex.Response as HttpWebResponse;
+                        errorHandler = RestError.GenericPostVowelError;
+
+                        if (response != null)
+                        {
+                            Debug.Log("HTTP Status Code: " + (int)response.StatusCode);
+                            switch ((int)response.StatusCode)
+                            {
+
+                                //			case 400:
+                                //				errorHandler = RestError.WrongMail;
+                                //				break;
+                                //			case 401:
+                                //				errorHandler = RestError.WrongPassword;
+                                //				break;
+                                case 500:
+                                    errorHandler = RestError.ServerError;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        break;
                     }
                 }
-                allProper = false;
             }
-
+            
         }
         else
         {
