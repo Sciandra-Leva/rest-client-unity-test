@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
-
+using System.Net;
 
 public class TestNetworkScript : MonoBehaviour {
 
@@ -14,11 +14,16 @@ public class TestNetworkScript : MonoBehaviour {
 		// first step, add it to the gameobject
 		client = gameObject.AddComponent<NetworkREST>();
 
+        // This is necessary for the certificate issue
+        ServicePointManager.ServerCertificateValidationCallback = client.RemoteCertificateValidationCallback;
+
 		// i'm currently doing it as a coroutine in order 
 		// to avoid slowing down the process. the yield return is simply
 		// to show how to avoid running ahead of time (ex: doing the gets 
 		// before the login has been done)
-		yield return StartCoroutine(client.LOGINUser ("sciandra@leva.io", "Sementera"));
+		yield return StartCoroutine(client.LOGINUser ("sciandra@leva.io\n", "Sementera"));
+
+    	Debug.Log ("Starting!");
 
 		if (client.errorHandler != RestError.AllGood) // this check should be done after every command.
 		{

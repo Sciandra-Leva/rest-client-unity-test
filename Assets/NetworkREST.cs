@@ -3,6 +3,7 @@
 // A small library to handle communication with our RESTful services
 // in the backend server.
 // Developed by: Lorenzo Sciandra
+// v0.8  - added some regex for email and pwd strings + workaround for certificate
 // v0.7  - modified in order to have retries for each call
 // v0.61 - added the corret Vowel implementation
 // v0.6  - now I also POST the various heartbeats files, and the Vowel POST. Also a small bugfix.
@@ -25,6 +26,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 
 public enum RestError
 {
@@ -97,8 +101,9 @@ public class NetworkREST : MonoBehaviour
         bool allProper = false;
         int retryCount = NumberOfRetries;
 
-        // I need to store those informations for other calls
-        login_email = email;
+        // First thing first - I need to do some cleanup of the email string
+        // And I need to store those informations for other calls
+        login_email = CleanInput(email);
         login_password = password;
 
         JSONObject nested_fields = new JSONObject(JSONObject.Type.OBJECT);
@@ -1407,6 +1412,49 @@ public class NetworkREST : MonoBehaviour
             Debug.Log(result);
         }
 
+    }
+
+    //---------------------------------------------------------------------
+    //-------------------------  PRIVATE METHODS  -------------------------
+    //---------------------------------------------------------------------
+
+    public bool RemoteCertificateValidationCallback(System.Object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+    {
+        bool isOk = true;
+        // If there are errors in the certificate chain, look at each error to determine the cause.
+        if (sslPolicyErrors != SslPolicyErrors.None)
+        {
+            for (int i = 0; i < chain.ChainStatus.Length; i++)
+            {
+                if (chain.ChainStatus[i].Status != X509ChainStatusFlags.RevocationStatusUnknown)
+                {
+                    chain.ChainPolicy.RevocationFlag = X509RevocationFlag.EntireChain;
+                    chain.ChainPolicy.RevocationMode = X509RevocationMode.Online;
+                    chain.ChainPolicy.UrlRetrievalTimeout = new TimeSpan(0, 1, 0);
+                    chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllFlags;
+                    bool chainIsValid = chain.Build((X509Certificate2)certificate);
+                    if (!chainIsValid)
+                    {
+                        isOk = false;
+                    }
+                }
+            }
+        }
+        return isOk;
+    }
+
+    static string CleanInput(string strIn)
+    {
+        // Replace invalid characters with empty strings.
+        try {
+           return Regex.Replace(strIn, @"[^\w\.@-]", ""); 
+        }
+        // If we timeout when replacing invalid characters, 
+        // we should return Empty.
+        catch (Exception ex) {
+           Debug.Log(ex);
+           return String.Empty;   
+        }
     }
 
 }
